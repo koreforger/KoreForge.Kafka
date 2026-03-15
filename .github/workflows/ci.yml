@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths-ignore:
+      - '**.md'
+      - 'doc/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths-ignore:
+      - '**.md'
+      - 'doc/**'
+  workflow_dispatch:
+    inputs:
+      koreforge_version:
+        description: 'KoreForge sibling package version on NuGet.org (e.g. 1.0.0). Leave blank to build from source.'
+        required: false
+        default: ''
+
+# Exposed as an MSBuild property via Directory.Packages.props $(KoreForgeVersion).
+# Set by workflow_dispatch input; empty for push/PR triggers (build from source).
+env:
+  KOREFORGE_VERSION: ${{ inputs.koreforge_version || '' }}
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    # Integration tests use Testcontainers to spin up their own Confluent Kafka container.
+    # Docker is available by default on ubuntu-latest; no extra service needed.
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # MinVer needs full history for tag-based versioning
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Build sibling dependencies
+        # Skipped when KOREFORGE_VERSION is set — packages are pulled from NuGet.org instead.
+        if: env.KOREFORGE_VERSION == ''
+        run: |
+          for repo in KoreForge.Time KoreForge.Metrics KoreForge.Logging KoreForge.Processing; do
+            if [ -d "../$repo" ]; then
+              sln=$(find "../$repo" -maxdepth 1 -name "*.sln" | head -1)
+              if [ -n "$sln" ]; then
+                echo "==> Building $repo"
+                dotnet build "$sln" -c Release --force
+                dotnet pack "$sln" -c Release --no-build
+              fi
+            fi
+          done
+
+      - name: Restore
+        run: dotnet restore KoreForge.Kafka.sln
+
+      - name: Build
+        run: dotnet build KoreForge.Kafka.sln -c Release --no-restore
+
+      - name: Run unit tests (exclude integration)
+        run: |
+          dotnet test KoreForge.Kafka.sln -c Release --no-build \
+            --filter "FullyQualifiedName!~IntegrationTests" \
+            --logger "trx;LogFileName=UnitTestResults.trx" \
+            --results-directory ./out/TestResults \
+            --collect:"XPlat Code Coverage" \
+            --settings coverlet.runsettings
+
+      - name: Run integration tests (Testcontainers manages Kafka lifecycle)
+        run: |
+          dotnet test KoreForge.Kafka.sln -c Release --no-build \
+            --filter "FullyQualifiedName~IntegrationTests" \
+            --logger "trx;LogFileName=IntegrationTestResults.trx" \
+            --results-directory ./out/TestResults
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: out/TestResults/**/*.trx
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: out/TestResults/**/coverage.cobertura.xml

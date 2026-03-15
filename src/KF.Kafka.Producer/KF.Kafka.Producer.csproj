@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Confluent.Kafka" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Options" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\KF.Kafka.Configuration\KF.Kafka.Configuration.csproj" />
+    <ProjectReference Include="..\KF.Kafka.Core\KF.Kafka.Core.csproj" />
+    <ProjectReference Include="..\..\..\KoreForge.Logging\src\KF.Logging.Runtime\KF.Logging.Runtime.csproj" />
+    <ProjectReference Include="..\..\..\KoreForge.Logging\src\KF.Logging.Generator\KF.Logging.Generator.csproj"
+                      ReferenceOutputAssembly="false"
+                      OutputItemType="Analyzer"
+                      PrivateAssets="all" />
+    <ProjectReference Include="..\..\..\KoreForge.Logging\src\KF.Logging.Analyzers\KF.Logging.Analyzers.csproj"
+                      ReferenceOutputAssembly="false"
+                      OutputItemType="Analyzer"
+                      PrivateAssets="all" />
+    <ProjectReference Include="..\..\..\KoreForge.Time\src\KF.Time\KF.Time.csproj" />
+    <ProjectReference Include="..\..\..\KoreForge.Metrics\src\KF.Metrics\KF.Metrics.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="KF.Kafka.Producer.Tests" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,42 @@
+<Project>
+  <PropertyGroup>
+    <Product>KoreForge.Kafka</Product>
+    <Company>KoreForge</Company>
+    <Authors>KoreForge</Authors>
+    <Copyright>Copyright © KoreForge</Copyright>
+    <PackageOutputPath>$(MSBuildThisFileDirectory)artifacts\</PackageOutputPath>
+    <PackageProjectUrl>https://github.com/koreforger/KoreForge.Kafka</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/koreforger/KoreForge.Kafka</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <MinVerTagPrefix>KoreForge.Kafka/v</MinVerTagPrefix>
+    <MinVerAutoIncrement>minor</MinVerAutoIncrement>
+    <MinVerDefaultPreReleaseIdentifiers>alpha.0</MinVerDefaultPreReleaseIdentifiers>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IsPackable)' == 'true'">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MinVer" PrivateAssets="all" />
+  </ItemGroup>
+
+  <Target Name="ApplyMinVerVersion"
+          DependsOnTargets="MinVer"
+          BeforeTargets="GetAssemblyVersion">
+    <PropertyGroup Condition="'$(IsPackable)' != 'false'">
+      <Version Condition="'$(Version)' == ''">$(MinVerVersion)</Version>
+      <PackageVersion Condition="'$(PackageVersion)' == ''">$(MinVerVersion)</PackageVersion>
+      <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">$(MinVerMajor).$(MinVerMinor).0.0</AssemblyVersion>
+      <FileVersion Condition="'$(FileVersion)' == ''">$(MinVerMajor).$(MinVerMinor).$(MinVerPatch).0</FileVersion>
+    </PropertyGroup>
+  </Target>
+</Project>

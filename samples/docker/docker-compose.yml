@@ -1,0 +1,48 @@
+﻿services:
+  redpanda:
+    image: redpandadata/redpanda:v24.1.2
+    container_name: kf-kafka-redpanda
+    command:
+      - redpanda
+      - start
+      - --overprovisioned
+      - --smp
+      - "1"
+      - --memory
+      - 1G
+      - --reserve-memory
+      - 0M
+      - --node-id
+      - "1"
+      - --check=false
+      - --kafka-addr
+      - PLAINTEXT://0.0.0.0:29092
+      - --advertise-kafka-addr
+      - PLAINTEXT://localhost:29092
+    ports:
+      - "29092:29092"
+      - "9644:9644"
+    volumes:
+      - ./kafka:/opt/redpanda/scripts
+    healthcheck:
+      test: ["CMD-SHELL", "rpk cluster info > /dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  sqledge:
+    image: mcr.microsoft.com/azure-sql-edge:latest
+    container_name: kf-kafka-sqledge
+    environment:
+      ACCEPT_EULA: "1"
+      MSSQL_SA_PASSWORD: "YourStrong!Passw0rd"
+    ports:
+      - "14333:1433"
+    volumes:
+      - ./sql:/init
+    healthcheck:
+      test:
+        ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P YourStrong!Passw0rd -Q 'SELECT 1' > /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
