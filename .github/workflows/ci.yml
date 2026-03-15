@@ -36,6 +36,41 @@ jobs:
         with:
           fetch-depth: 0   # MinVer needs full history for tag-based versioning
 
+      - name: Checkout KoreForge.Time (dependency)
+        uses: actions/checkout@v4
+        with:
+          repository: koreforger/KoreForge.Time
+          path: dep/KoreForge.Time
+          fetch-depth: 0
+
+      - name: Checkout KoreForge.Metrics (dependency)
+        uses: actions/checkout@v4
+        with:
+          repository: koreforger/KoreForge.Metrics
+          path: dep/KoreForge.Metrics
+          fetch-depth: 0
+
+      - name: Checkout KoreForge.Logging (dependency)
+        uses: actions/checkout@v4
+        with:
+          repository: koreforger/KoreForge.Logging
+          path: dep/KoreForge.Logging
+          fetch-depth: 0
+
+      - name: Checkout KoreForge.Processing (dependency)
+        uses: actions/checkout@v4
+        with:
+          repository: koreforger/KoreForge.Processing
+          path: dep/KoreForge.Processing
+          fetch-depth: 0
+
+      - name: Link dependencies as siblings
+        run: |
+          ln -s "${{ github.workspace }}/dep/KoreForge.Time"       "${{ github.workspace }}/../KoreForge.Time"
+          ln -s "${{ github.workspace }}/dep/KoreForge.Metrics"    "${{ github.workspace }}/../KoreForge.Metrics"
+          ln -s "${{ github.workspace }}/dep/KoreForge.Logging"    "${{ github.workspace }}/../KoreForge.Logging"
+          ln -s "${{ github.workspace }}/dep/KoreForge.Processing" "${{ github.workspace }}/../KoreForge.Processing"
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
