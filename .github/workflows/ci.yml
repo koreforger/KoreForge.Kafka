@@ -70,6 +70,17 @@ jobs:
           ln -s "${{ github.workspace }}/dep/KoreForge.Metrics"    "${{ github.workspace }}/../KoreForge.Metrics"
           ln -s "${{ github.workspace }}/dep/KoreForge.Logging"    "${{ github.workspace }}/../KoreForge.Logging"
           ln -s "${{ github.workspace }}/dep/KoreForge.Processing" "${{ github.workspace }}/../KoreForge.Processing"
+          # Block Kafka's NuGet.config from propagating into sibling builds:
+          # its local artifact sources don't exist yet when the deps are being built.
+          cat > dep/NuGet.config << 'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <configuration>
+            <packageSources>
+              <clear />
+              <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
+            </packageSources>
+          </configuration>
+          EOF
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
