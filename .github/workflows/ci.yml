@@ -90,25 +90,25 @@ jobs:
       - name: Build KoreForge.Time (dependency)
         if: env.KOREFORGE_VERSION == ''
         run: |
-          dotnet build dep/KoreForge.Time/KoreForge.Time.sln -c Release /p:GenerateDocumentationFile=true "/p:NoWarn=CS1570;CS1571;CS1572;CS1573;CS1574;CS1580;CS1581;CS1584;CS1587;CS1589;CS1590;CS1591;CS1592;CS1593;CS1594;CS1595;CS1596;CS1597;CS1598;CS1599"
+          dotnet build dep/KoreForge.Time/KoreForge.Time.sln -c Release
           dotnet pack  dep/KoreForge.Time/KoreForge.Time.sln -c Release --no-build
 
       - name: Build KoreForge.Metrics (dependency)
         if: env.KOREFORGE_VERSION == ''
         run: |
-          dotnet build dep/KoreForge.Metrics/KoreForge.Metrics.sln -c Release /p:GenerateDocumentationFile=true "/p:NoWarn=CS1570;CS1571;CS1572;CS1573;CS1574;CS1580;CS1581;CS1584;CS1587;CS1589;CS1590;CS1591;CS1592;CS1593;CS1594;CS1595;CS1596;CS1597;CS1598;CS1599"
+          dotnet build dep/KoreForge.Metrics/KoreForge.Metrics.sln -c Release
           dotnet pack  dep/KoreForge.Metrics/KoreForge.Metrics.sln -c Release --no-build
 
       - name: Build KoreForge.Logging (dependency)
         if: env.KOREFORGE_VERSION == ''
         run: |
-          dotnet build dep/KoreForge.Logging/KoreForge.Logging.sln -c Release /p:GenerateDocumentationFile=true "/p:NoWarn=CS1570;CS1571;CS1572;CS1573;CS1574;CS1580;CS1581;CS1584;CS1587;CS1589;CS1590;CS1591;CS1592;CS1593;CS1594;CS1595;CS1596;CS1597;CS1598;CS1599"
+          dotnet build dep/KoreForge.Logging/KoreForge.Logging.sln -c Release
           dotnet pack  dep/KoreForge.Logging/KoreForge.Logging.sln -c Release --no-build
 
       - name: Build KoreForge.Processing (dependency)
         if: env.KOREFORGE_VERSION == ''
         run: |
-          dotnet build dep/KoreForge.Processing/KoreForge.Processing.sln -c Release /p:GenerateDocumentationFile=true "/p:NoWarn=CS1570;CS1571;CS1572;CS1573;CS1574;CS1580;CS1581;CS1584;CS1587;CS1589;CS1590;CS1591;CS1592;CS1593;CS1594;CS1595;CS1596;CS1597;CS1598;CS1599"
+          dotnet build dep/KoreForge.Processing/KoreForge.Processing.sln -c Release
           dotnet pack  dep/KoreForge.Processing/KoreForge.Processing.sln -c Release --no-build
 
       - name: Restore
