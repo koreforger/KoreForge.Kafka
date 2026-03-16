@@ -33,7 +33,6 @@ jobs:
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       TESTCONTAINERS_RYUK_DISABLED: true
-      DOCKER_HOST: unix:///var/run/docker.sock
 
     steps:
       - name: Checkout
@@ -131,8 +130,14 @@ jobs:
             --collect:"XPlat Code Coverage" \
             --settings coverlet.runsettings
 
+      - name: Docker diagnostics and image pre-pull
+        run: |
+          docker version
+          docker info
+          docker pull confluentinc/cp-kafka:7.6.1
+
       # Run each integration test project sequentially so only one KafkaContainer
-      # is alive at a time — parallel Docker starts cause connection resets.
+      # is alive at a time — avoids Docker resource contention.
       - name: Run AdminClient integration tests
         run: |
           dotnet test tst/KF.Kafka.AdminClient.IntegrationTests/KF.Kafka.AdminClient.IntegrationTests.csproj \

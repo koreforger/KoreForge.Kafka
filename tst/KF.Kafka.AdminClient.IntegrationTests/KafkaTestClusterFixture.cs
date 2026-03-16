@@ -12,8 +12,7 @@ public sealed class KafkaTestClusterFixture : IAsyncLifetime
 
     public KafkaTestClusterFixture()
     {
-        _kafkaContainer = new KafkaBuilder()
-            .WithImage("confluentinc/cp-kafka:7.6.1")
+        _kafkaContainer = new KafkaBuilder("confluentinc/cp-kafka:7.6.1")
             .Build();
     }
 
