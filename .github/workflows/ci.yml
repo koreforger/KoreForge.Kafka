@@ -131,11 +131,27 @@ jobs:
             --collect:"XPlat Code Coverage" \
             --settings coverlet.runsettings
 
-      - name: Run integration tests (Testcontainers manages Kafka lifecycle)
+      # Run each integration test project sequentially so only one KafkaContainer
+      # is alive at a time — parallel Docker starts cause connection resets.
+      - name: Run AdminClient integration tests
         run: |
-          dotnet test KoreForge.Kafka.sln -c Release --no-build \
-            --filter "FullyQualifiedName~IntegrationTests" \
-            --logger "trx;LogFileName=IntegrationTestResults.trx" \
+          dotnet test tst/KF.Kafka.AdminClient.IntegrationTests/KF.Kafka.AdminClient.IntegrationTests.csproj \
+            -c Release --no-build \
+            --logger "trx;LogFileName=AdminClientIntegrationTestResults.trx" \
+            --results-directory ./out/TestResults
+
+      - name: Run Consumer integration tests
+        run: |
+          dotnet test tst/KF.Kafka.Consumer.IntegrationTests/KF.Kafka.Consumer.IntegrationTests.csproj \
+            -c Release --no-build \
+            --logger "trx;LogFileName=ConsumerIntegrationTestResults.trx" \
+            --results-directory ./out/TestResults
+
+      - name: Run Producer integration tests
+        run: |
+          dotnet test tst/KF.Kafka.Producer.IntegrationTests/KF.Kafka.Producer.IntegrationTests.csproj \
+            -c Release --no-build \
+            --logger "trx;LogFileName=ProducerIntegrationTestResults.trx" \
             --results-directory ./out/TestResults
 
       - name: Upload test results
