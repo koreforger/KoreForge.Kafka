@@ -100,6 +100,12 @@ internal sealed class KafkaConsumerWorker : IKafkaConsumerWorker
         {
             // Host requested cancellation; swallow to allow graceful shutdown.
         }
+        catch (Exception)
+        {
+            // Worker already faulted (e.g. processor threw); the supervisor has
+            // already observed and handled the failure via the observer loop.
+            // Swallow here so shutdown completes cleanly.
+        }
         finally
         {
             _logs.Status.Stopped.LogInformation("Worker {WorkerId} stopped", WorkerId);
