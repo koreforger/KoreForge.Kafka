@@ -261,12 +261,15 @@ public sealed class KafkaConsumerHostIntegrationTests
         await ProduceValuesAsync(topic, initialValues, DateTime.UtcNow, partition: 0);
         await contextA.WaitAsync(TimeSpan.FromSeconds(30), cts.Token);
 
+        // Let the initial two-member rebalance settle before removing a member.
         await hostB.StartAsync(cts.Token);
-        await Task.Delay(TimeSpan.FromSeconds(2), cts.Token);
+        await Task.Delay(TimeSpan.FromSeconds(5), cts.Token);
 
+        // StopAsync completes after consumer.Close() sends LeaveGroup.
         await hostA.StopAsync(cts.Token);
-        await Task.Delay(TimeSpan.FromSeconds(2), cts.Token);
 
+        // Produce recovery values immediately — they will sit in the topic
+        // until the coordinator rebalances partition 0 back to hostB.
         await ProduceValuesAsync(topic, recoveryPart0, DateTime.UtcNow, partition: 0);
         await ProduceValuesAsync(topic, recoveryPart1, DateTime.UtcNow, partition: 1);
         await contextB.WaitAsync(TimeSpan.FromSeconds(60), cts.Token);
@@ -871,6 +874,8 @@ public sealed class KafkaConsumerHostIntegrationTests
         profile.Topics.Add(topic);
         profile.ConfluentOptions["auto.offset.reset"] = "earliest";
         profile.ConfluentOptions["enable.auto.commit"] = "false";
+        profile.ConfluentOptions["session.timeout.ms"] = "6000";
+        profile.ConfluentOptions["heartbeat.interval.ms"] = "2000";
         root.Profiles[profileName] = profile;
 
         var factory = new KafkaClientConfigFactory(
