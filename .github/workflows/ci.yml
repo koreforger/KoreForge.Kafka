@@ -90,25 +90,25 @@ jobs:
       - name: Build KoreForge.Time (dependency)
         if: env.KOREFORGE_VERSION == ''
         run: |
-          dotnet build dep/KoreForge.Time/KoreForge.Time.sln -c Release
+          dotnet build dep/KoreForge.Time/KoreForge.Time.sln -c Release /p:Version=0.0.0-alpha.0 /p:PackageVersion=0.0.0-alpha.0
           dotnet pack  dep/KoreForge.Time/KoreForge.Time.sln -c Release --no-build
 
       - name: Build KoreForge.Metrics (dependency)
         if: env.KOREFORGE_VERSION == ''
         run: |
-          dotnet build dep/KoreForge.Metrics/KoreForge.Metrics.sln -c Release
+          dotnet build dep/KoreForge.Metrics/KoreForge.Metrics.sln -c Release /p:Version=0.0.0-alpha.0 /p:PackageVersion=0.0.0-alpha.0
           dotnet pack  dep/KoreForge.Metrics/KoreForge.Metrics.sln -c Release --no-build
 
       - name: Build KoreForge.Logging (dependency)
         if: env.KOREFORGE_VERSION == ''
         run: |
-          dotnet build dep/KoreForge.Logging/KoreForge.Logging.sln -c Release
+          dotnet build dep/KoreForge.Logging/KoreForge.Logging.sln -c Release /p:Version=0.0.0-alpha.0 /p:PackageVersion=0.0.0-alpha.0
           dotnet pack  dep/KoreForge.Logging/KoreForge.Logging.sln -c Release --no-build
 
       - name: Build KoreForge.Processing (dependency)
         if: env.KOREFORGE_VERSION == ''
         run: |
-          dotnet build dep/KoreForge.Processing/KoreForge.Processing.sln -c Release
+          dotnet build dep/KoreForge.Processing/KoreForge.Processing.sln -c Release /p:Version=0.0.0-alpha.0 /p:PackageVersion=0.0.0-alpha.0
           dotnet pack  dep/KoreForge.Processing/KoreForge.Processing.sln -c Release --no-build
 
       - name: Restore
