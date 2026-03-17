@@ -25,6 +25,7 @@ public sealed class KafkaConsumerHostBuilder
     private string? _profileName;
     private IKafkaClientConfigFactory? _configFactory;
     private Func<IKafkaBatchProcessor>? _processorFactory;
+    private Action<ExtendedConsumerSettings>? _consumerSettingsApplicator;
     private ILoggerFactory _loggerFactory = NullLoggerFactory.Instance;
     private ISystemClock _clock = SystemClock.Instance;
     private IBackpressurePolicy? _backpressurePolicy;
@@ -69,6 +70,9 @@ public sealed class KafkaConsumerHostBuilder
             .UseIntegrationMetrics(_pipelineIntegrationMetrics);
         configure?.Invoke(builder);
         _processorFactory = () => builder.Build(pipelineFactory);
+        // Capture a reference so Build() can apply ExtendedConsumerSettings after
+        // the consumer profile (and its settings) are resolved from config.
+        _consumerSettingsApplicator = settings => builder.ApplyConsumerSettings(settings);
         return this;
     }
 
@@ -157,6 +161,11 @@ public sealed class KafkaConsumerHostBuilder
         }
 
         var runtime = _configFactory.CreateConsumer(_profileName);
+
+        // Apply consumer settings to the pipeline builder (e.g. DOP from config)
+        // before creating the supervisor — the processor factory captures the builder.
+        _consumerSettingsApplicator?.Invoke(runtime.Extended);
+
         var backpressurePolicy = _backpressurePolicy ?? CreateBackpressurePolicy(runtime.Extended, _loggerFactory);
         var runtimeState = new KafkaConsumerRuntimeState(runtime.Extended.ConsumerCount);
         var supervisor = new KafkaConsumerSupervisor(runtime, _processorFactory, runtimeState, _loggerFactory, _clock, backpressurePolicy, _restartPolicy);

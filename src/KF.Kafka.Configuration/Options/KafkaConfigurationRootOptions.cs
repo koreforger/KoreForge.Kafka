@@ -62,6 +62,21 @@ public sealed class ExtendedConsumerSettings
     public TimeSpan? StartRelative { get; init; }
     public int MaxBatchSize { get; init; } = 500;
     public int MaxBatchWaitMs { get; init; } = 1_000;
+
+    /// <summary>
+    /// How long the Confluent consumer poll call blocks waiting for a message.
+    /// Lower values reduce latency when the topic is idle; higher values reduce
+    /// CPU busy-waiting. Default: 100 ms.
+    /// </summary>
+    public int PollTimeoutMs { get; init; } = 100;
+
+    /// <summary>
+    /// Maximum degree of parallelism for processing records within a single batch.
+    /// 1 (default) = sequential. Set higher to process records in a batch concurrently
+    /// when pipeline steps are thread-safe and I/O-bound.
+    /// </summary>
+    public int PipelineMaxDegreeOfParallelism { get; init; } = 1;
+
     public bool IsolateConsumerCertificatePerThread { get; init; }
     public bool DuplicateCertificatePerWorker { get; init; }
     public int MaxInFlightBatches { get; init; } = 8;

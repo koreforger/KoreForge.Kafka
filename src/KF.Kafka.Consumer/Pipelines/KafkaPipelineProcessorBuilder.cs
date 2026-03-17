@@ -1,5 +1,6 @@
 using KF.Kafka.Consumer.Abstractions;
 using KF.Kafka.Consumer.Batch;
+using KF.Kafka.Configuration.Options;
 using KoreForge.Processing.Pipelines;
 using KoreForge.Processing.Pipelines.Instrumentation;
 
@@ -12,6 +13,7 @@ public sealed class KafkaPipelineProcessorBuilder<TOut>
 {
     private Func<IBatchPipelineExecutor<KafkaPipelineRecord, TOut>>? _executorFactory;
     private Func<PipelineExecutionOptions> _executionOptionsFactory = static () => new PipelineExecutionOptions();
+    private bool _executionOptionsExplicitlySet;
     private Func<PipelineContext> _contextFactory = static () => new PipelineContext();
     private Action<KafkaRecordBatch, PipelineContext>? _contextInitializer;
     private string _pipelineName = "kafka-consumer-pipeline";
@@ -42,12 +44,14 @@ public sealed class KafkaPipelineProcessorBuilder<TOut>
             throw new ArgumentNullException(nameof(options));
         }
 
+        _executionOptionsExplicitlySet = true;
         _executionOptionsFactory = () => options;
         return this;
     }
 
     public KafkaPipelineProcessorBuilder<TOut> ConfigureExecutionOptions(Func<PipelineExecutionOptions> factory)
     {
+        _executionOptionsExplicitlySet = true;
         _executionOptionsFactory = factory ?? throw new ArgumentNullException(nameof(factory));
         return this;
     }
@@ -92,6 +96,21 @@ public sealed class KafkaPipelineProcessorBuilder<TOut>
     {
         _integrationMetrics = metrics ?? throw new ArgumentNullException(nameof(metrics));
         return this;
+    }
+
+    internal void ApplyConsumerSettings(ExtendedConsumerSettings settings)
+    {
+        // Only override execution options if the caller has not explicitly configured them.
+        if (!_executionOptionsExplicitlySet)
+        {
+            var dop = Math.Max(1, settings.PipelineMaxDegreeOfParallelism);
+            _executionOptionsFactory = () => new PipelineExecutionOptions
+            {
+                // Sequential mode when DOP=1 skips the parallel task machinery entirely.
+                IsSequential = dop == 1,
+                MaxDegreeOfParallelism = dop,
+            };
+        }
     }
 
     internal IKafkaBatchProcessor Build(Func<IProcessingPipeline<KafkaPipelineRecord, TOut>> pipelineFactory)

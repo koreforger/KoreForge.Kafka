@@ -134,7 +134,7 @@ internal sealed class KafkaConsumerWorker : IKafkaConsumerWorker
                 ConsumeResult<byte[], byte[]>? result;
                 try
                 {
-                    result = consumer.Consume(TimeSpan.FromMilliseconds(100));
+                    result = consumer.Consume(TimeSpan.FromMilliseconds(_settings.PollTimeoutMs));
                 }
                 catch (ConsumeException ex)
                 {
@@ -384,7 +384,11 @@ internal sealed class KafkaConsumerWorker : IKafkaConsumerWorker
             await pending.Task.ConfigureAwait(false);
             var duration = _clock.Now - pending.StartedAt;
             _runtimeRecord.RecordBatch(pending.Batch.Count, duration, _clock.Now.LocalDateTime);
-            consumer.Commit(pending.Batch.Records[^1]);
+            // StoreOffset is a non-blocking, local operation.  librdkafka will include this
+            // offset in the next periodic auto-commit (enable.auto.commit = true, default).
+            // Using the synchronous Commit() here caused a ~50-70 ms broker round-trip that
+            // blocked the consumer loop on every single batch.
+            consumer.StoreOffset(pending.Batch.Records[^1]);
             _onBatchSuccess?.Invoke();
             _logs.Batch.Dispatched.LogDebug("Worker {WorkerId} processed batch of {BatchSize}", WorkerId, pending.Batch.Count);
         }

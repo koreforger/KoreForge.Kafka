@@ -266,6 +266,10 @@ internal sealed class KafkaConsumerSupervisor : IAsyncDisposable
         var config = new ConsumerConfig(template);
         config.ClientId = BuildClientId(template.ClientId, workerIndex);
         config.EnablePartitionEof = true;
+        // Disable auto-store so that StoreOffset() in CompleteBatchAsync controls exactly
+        // which offsets are eligible for the next periodic auto-commit.  This prevents
+        // librdkafka from auto-storing every polled message before we have processed it.
+        config.EnableAutoOffsetStore = false;
         return config;
     }
 
