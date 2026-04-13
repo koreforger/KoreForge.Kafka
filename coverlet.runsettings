@@ -5,7 +5,7 @@
       <DataCollector friendlyName="XPlat Code Coverage">
         <Configuration>
           <Format>cobertura</Format>
-          <Exclude>[*.Tests]*,[*.IntegrationTests]*</Exclude>
+          <Exclude>[*.Tests]*,[*.IntegrationTests]*,[*.Integration.Tests]*,[*.Benchmarks]*,[*.Sample]*</Exclude>
           <ExcludeByAttribute>GeneratedCodeAttribute,CompilerGeneratedAttribute</ExcludeByAttribute>
         </Configuration>
       </DataCollector>
