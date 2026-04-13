@@ -5,56 +5,47 @@ on:
     tags:
       - 'KoreForge.Kafka/v*'
 
+permissions:
+  contents: write
+  id-token: write
+
 jobs:
   publish:
     name: Pack & Publish
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write   # needed to create GitHub Release
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # MinVer needs full history
+          fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.x'
+          dotnet-version: '10.0.x'
 
-      - name: Build sibling dependencies
-        run: |
-          for repo in KoreForge.Time KoreForge.Metrics KoreForge.Logging KoreForge.Processing; do
-            if [ -d "../$repo" ]; then
-              sln=$(find "../$repo" -maxdepth 1 -name "*.sln" | head -1)
-              if [ -n "$sln" ]; then
-                echo "==> Building $repo"
-                dotnet build "$sln" -c Release --force
-                dotnet pack "$sln" -c Release --no-build
-              fi
-            fi
-          done
+      - name: Build
+        run: dotnet build KoreForge.Kafka.sln -c Release
 
-      - name: Restore
-        run: dotnet restore KoreForge.Kafka.sln
-
-      - name: Build (Release)
-        run: dotnet build KoreForge.Kafka.sln -c Release --no-restore
-
-      - name: Run unit tests (exclude integration)
+      - name: Test
         run: |
           dotnet test KoreForge.Kafka.sln -c Release --no-build \
             --filter "FullyQualifiedName!~IntegrationTests"
 
       - name: Pack
-        run: dotnet pack src/KF.Kafka/KF.Kafka.csproj -c Release --no-build -o ./artifacts
+        run: dotnet pack src/KF.Kafka/KF.Kafka.csproj -c Release --no-build -o artifacts/
+
+      - name: NuGet login (Trusted Publishing)
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ secrets.NUGET_USER }}
 
       - name: Push to NuGet.org
         run: |
-          dotnet nuget push ./artifacts/*.nupkg \
-            --api-key ${{ secrets.NUGET_API_KEY }} \
+          dotnet nuget push artifacts/*.nupkg \
+            --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" \
             --source https://api.nuget.org/v3/index.json \
             --skip-duplicate
 
