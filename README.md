@@ -39,16 +39,16 @@ See [doc/UsageGuide.md](doc/UsageGuide.md) for detailed usage examples.
 
 ```powershell
 # Clean
-.\bin\build-clean.ps1
+.\scr\build-clean.ps1
 
 # Build and test
-.\bin\build-test.ps1
+.\scr\build-test.ps1
 
 # Build, test, and generate coverage report
-.\bin\build-test-codecoverage.ps1
+.\scr\build-test-codecoverage.ps1
 
 # Pack NuGet
-.\bin\build-pack.ps1
+.\scr\build-pack.ps1
 ```
 
 ## Docker dev infrastructure
@@ -87,7 +87,7 @@ tst/
   KF.Kafka.Producer.IntegrationTests/
 samples/
   docker/                             Local dev infrastructure (Redpanda + SQL)
-bin/
+scr/
   build-*.ps1                         Automation scripts
 ```
 

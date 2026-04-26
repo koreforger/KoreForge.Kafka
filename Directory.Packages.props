@@ -5,7 +5,7 @@
     <!--
       KoreForge sibling package version — one property governs all three deps.
 
-        Local dev  : 0.0.0-alpha.0   resolved from NuGet.config local artifact sources
+        Local dev  : 0.0.7-alpha      resolved from NuGet.config local artifact sources
                                      after running  bin/build-deps.ps1
         CI standalone              : set the KOREFORGE_VERSION environment variable to
                                      the target NuGet.org release tag; the sibling
@@ -13,7 +13,7 @@
         Version bump               : update the default value below and commit.
     -->
     <KoreForgeVersion Condition="'$(KOREFORGE_VERSION)' != ''">$(KOREFORGE_VERSION)</KoreForgeVersion>
-    <KoreForgeVersion Condition="'$(KoreForgeVersion)' == ''">0.0.0-alpha.0</KoreForgeVersion>
+    <KoreForgeVersion Condition="'$(KoreForgeVersion)' == ''">0.0.7-alpha</KoreForgeVersion>
   </PropertyGroup>
 
   <!-- KoreForge sibling packages -->
