@@ -58,6 +58,34 @@ public class KafkaConfigValidatorTests
         result.Errors.Should().Contain(e => e.Contains("MaxBatchWaitMs", StringComparison.OrdinalIgnoreCase));
     }
 
+    [Theory]
+    [InlineData("PollTimeoutMs")]
+    [InlineData("PausedPollTimeoutMs")]
+    [InlineData("MaxInFlightBatches")]
+    [InlineData("BatchProcessingTimeoutMs")]
+    public void ValidateConsumer_Fails_WhenRuntimeTuningInvalid(string settingName)
+    {
+        var validator = new KafkaConfigValidator();
+        var settings = settingName switch
+        {
+            "PollTimeoutMs" => new ExtendedConsumerSettings { PollTimeoutMs = 0 },
+            "PausedPollTimeoutMs" => new ExtendedConsumerSettings { PausedPollTimeoutMs = 0 },
+            "MaxInFlightBatches" => new ExtendedConsumerSettings { MaxInFlightBatches = 0 },
+            "BatchProcessingTimeoutMs" => new ExtendedConsumerSettings { BatchProcessingTimeoutMs = 0 },
+            _ => throw new ArgumentOutOfRangeException(nameof(settingName))
+        };
+        var runtime = new KafkaConsumerRuntimeConfig(
+            new ConsumerConfig { BootstrapServers = "localhost:9092", GroupId = "group" },
+            settings,
+            new[] { "topic-1" },
+            new KafkaSecuritySettings());
+
+        var result = validator.ValidateConsumer(runtime);
+
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().Contain(e => e.Contains(settingName, StringComparison.OrdinalIgnoreCase));
+    }
+
     [Fact]
     public void ValidateConsumer_Fails_WhenDuplicateWithoutIsolation()
     {

@@ -25,6 +25,7 @@ public enum ConsumerLogEvents
     Worker_Backpressure_Paused = 1181,
     Worker_Backpressure_Resumed = 1182,
     Worker_Backpressure_Deferred = 1183,
+    Worker_Backpressure_Summary = 1184,
 
     Certificates_Isolation_Configured = 1300,
     Certificates_Isolation_Created = 1301,

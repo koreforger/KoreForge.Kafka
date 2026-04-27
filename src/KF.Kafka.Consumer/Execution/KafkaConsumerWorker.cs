@@ -35,6 +35,11 @@ internal sealed class KafkaConsumerWorker : IKafkaConsumerWorker
     private CancellationTokenSource? _cts;
     private Task? _executionTask;
     private readonly Action? _onBatchSuccess;
+    private Error? _fatalKafkaError;
+    private long _backpressureEvaluationCount;
+    private long _backpressurePauseDecisionCount;
+    private long _backpressureResumeDecisionCount;
+    private DateTimeOffset _nextBackpressureSummaryAt;
 
     public KafkaConsumerWorker(
         int workerIndex,
@@ -130,11 +135,12 @@ internal sealed class KafkaConsumerWorker : IKafkaConsumerWorker
             while (!cancellationToken.IsCancellationRequested)
             {
                 await DrainCompletedBatchesAsync(consumer, waitForAll: false, cancellationToken);
+                ThrowIfFatalKafkaError();
 
                 ConsumeResult<byte[], byte[]>? result;
                 try
                 {
-                    result = consumer.Consume(TimeSpan.FromMilliseconds(_settings.PollTimeoutMs));
+                    result = consumer.Consume(GetCurrentPollTimeout());
                 }
                 catch (ConsumeException ex)
                 {
@@ -145,6 +151,8 @@ internal sealed class KafkaConsumerWorker : IKafkaConsumerWorker
                 {
                     break;
                 }
+
+                ThrowIfFatalKafkaError();
 
                 if (result is null)
                 {
@@ -233,7 +241,7 @@ internal sealed class KafkaConsumerWorker : IKafkaConsumerWorker
 
         var startedAt = _clock.Now;
         var batch = new KafkaRecordBatch(snapshot, startedAt);
-        var processingTask = Task.Run(() => _processor.ProcessAsync(batch, cancellationToken), CancellationToken.None);
+        var processingTask = Task.Run(() => ProcessBatchWithTimeoutAsync(batch, cancellationToken), CancellationToken.None);
         _pendingBatches.Add(new PendingBatch(batch, processingTask, startedAt));
         _runtimeRecord.RecordBacklog(_pendingBatches.Count, _maxInFlightBatches);
         EvaluateBackpressure(consumer);
@@ -248,6 +256,7 @@ internal sealed class KafkaConsumerWorker : IKafkaConsumerWorker
                 if (error.IsFatal)
                 {
                     _logs.Consume.Error.LogCritical("Worker {WorkerId} fatal Kafka error: {Reason}", WorkerId, error.Reason);
+                    _fatalKafkaError = error;
                 }
                 else
                 {
@@ -417,7 +426,8 @@ internal sealed class KafkaConsumerWorker : IKafkaConsumerWorker
             _pendingBatches.Count == 0 ? 0 : (double)_pendingBatches.Count / _maxInFlightBatches);
 
         var decision = _backpressurePolicy.Evaluate(context);
-        LogBackpressureDecision(decision, context);
+        RecordBackpressureDecision(decision);
+        LogBackpressureSummaryIfDue(context);
         if (decision == BackpressureDecision.Pause)
         {
             PauseConsumer(consumer);
@@ -490,15 +500,89 @@ internal sealed class KafkaConsumerWorker : IKafkaConsumerWorker
             CurrentUtilization());
     }
 
-    private void LogBackpressureDecision(BackpressureDecision decision, BackpressureContext context)
+    private void RecordBackpressureDecision(BackpressureDecision decision)
     {
-        _logs.Backpressure.Decision.LogInformation(
-            "Worker {WorkerId} evaluated backlog {Backlog}/{Capacity} ({Utilization:P0}) => {Decision}",
+        _backpressureEvaluationCount++;
+        if (decision == BackpressureDecision.Pause)
+        {
+            _backpressurePauseDecisionCount++;
+        }
+        else if (decision == BackpressureDecision.Resume)
+        {
+            _backpressureResumeDecisionCount++;
+        }
+    }
+
+    private void LogBackpressureSummaryIfDue(BackpressureContext context)
+    {
+        if (_settings.BackpressureSummaryLogIntervalMs <= 0)
+        {
+            return;
+        }
+
+        var now = _clock.Now;
+        if (_nextBackpressureSummaryAt == default)
+        {
+            _nextBackpressureSummaryAt = now + TimeSpan.FromMilliseconds(_settings.BackpressureSummaryLogIntervalMs);
+            return;
+        }
+
+        if (now < _nextBackpressureSummaryAt)
+        {
+            return;
+        }
+
+        _logs.Backpressure.Summary.LogInformation(
+            "Worker {WorkerId} backpressure summary: evaluated {EvaluationCount} times, pause decisions {PauseDecisionCount}, resume decisions {ResumeDecisionCount}, current backlog {Backlog}/{Capacity} ({Utilization:P0}), paused {IsPaused}",
             context.WorkerId,
+            _backpressureEvaluationCount,
+            _backpressurePauseDecisionCount,
+            _backpressureResumeDecisionCount,
             context.BacklogSize,
             context.Capacity,
             context.Utilization,
-            decision);
+            _isPaused);
+
+        _backpressureEvaluationCount = 0;
+        _backpressurePauseDecisionCount = 0;
+        _backpressureResumeDecisionCount = 0;
+        _nextBackpressureSummaryAt = now + TimeSpan.FromMilliseconds(_settings.BackpressureSummaryLogIntervalMs);
+    }
+
+    private TimeSpan GetCurrentPollTimeout()
+    {
+        var timeoutMs = _isPaused ? _settings.PausedPollTimeoutMs : _settings.PollTimeoutMs;
+        return TimeSpan.FromMilliseconds(timeoutMs <= 0 ? 1 : timeoutMs);
+    }
+
+    private void ThrowIfFatalKafkaError()
+    {
+        if (_fatalKafkaError is not null)
+        {
+            throw new KafkaFatalConsumerException(WorkerId, _fatalKafkaError);
+        }
+    }
+
+    private async Task ProcessBatchWithTimeoutAsync(KafkaRecordBatch batch, CancellationToken cancellationToken)
+    {
+        var timeout = TimeSpan.FromMilliseconds(_settings.BatchProcessingTimeoutMs <= 0 ? 1 : _settings.BatchProcessingTimeoutMs);
+        using var timeoutCts = _settings.BatchTimeoutAction == ConsumerBatchTimeoutAction.CancelBatchAndFailWorker
+            ? CancellationTokenSource.CreateLinkedTokenSource(cancellationToken)
+            : null;
+        var processorToken = timeoutCts?.Token ?? cancellationToken;
+        var processorTask = _processor.ProcessAsync(batch, processorToken);
+        var delayTask = Task.Delay(timeout, cancellationToken);
+
+        var completed = await Task.WhenAny(processorTask, delayTask).ConfigureAwait(false);
+        if (completed == processorTask)
+        {
+            await processorTask.ConfigureAwait(false);
+            return;
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+        timeoutCts?.Cancel();
+        throw new KafkaBatchProcessingTimeoutException(WorkerId, batch.Count, timeout);
     }
 
     private double CurrentUtilization() => _maxInFlightBatches == 0 ? 0 : (double)_pendingBatches.Count / _maxInFlightBatches;
@@ -562,6 +646,15 @@ internal sealed class KafkaConsumerWorker : IKafkaConsumerWorker
         internal void ResumeConsumer(IConsumer<byte[], byte[]> consumer) => _owner.ResumeConsumer(consumer);
 
         internal void EvaluateBackpressure(IConsumer<byte[], byte[]> consumer) => _owner.EvaluateBackpressure(consumer);
+
+        internal TimeSpan GetCurrentPollTimeout() => _owner.GetCurrentPollTimeout();
+
+        internal void SetFatalKafkaError(Error error) => _owner._fatalKafkaError = error;
+
+        internal void ThrowIfFatalKafkaError() => _owner.ThrowIfFatalKafkaError();
+
+        internal Task ProcessBatchWithTimeoutAsync(KafkaRecordBatch batch, CancellationToken cancellationToken) =>
+            _owner.ProcessBatchWithTimeoutAsync(batch, cancellationToken);
 
         internal void SetAssignedPartitions(IEnumerable<TopicPartition> partitions)
         {

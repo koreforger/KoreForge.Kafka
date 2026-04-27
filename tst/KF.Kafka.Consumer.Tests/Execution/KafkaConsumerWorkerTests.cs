@@ -159,6 +159,59 @@ public sealed class KafkaConsumerWorkerTests
         policy.Contexts[0].BacklogSize.Should().Be(1);
     }
 
+    [Fact]
+    public void GetCurrentPollTimeout_UsesPausedTimeoutWhenPaused()
+    {
+        var worker = CreateWorker(new ExtendedConsumerSettings
+        {
+            PollTimeoutMs = 25,
+            PausedPollTimeoutMs = 750
+        });
+        var accessor = worker.CreateTestAccessor();
+
+        accessor.GetCurrentPollTimeout().Should().Be(TimeSpan.FromMilliseconds(25));
+
+        accessor.SetPausedState(true);
+
+        accessor.GetCurrentPollTimeout().Should().Be(TimeSpan.FromMilliseconds(750));
+    }
+
+    [Fact]
+    public void ThrowIfFatalKafkaError_ThrowsFatalConsumerException()
+    {
+        var worker = CreateWorker();
+        var accessor = worker.CreateTestAccessor();
+        var error = new Error(ErrorCode.Local_Fatal, "fatal");
+
+        accessor.SetFatalKafkaError(error);
+
+        var act = accessor.ThrowIfFatalKafkaError;
+
+        act.Should().Throw<KafkaFatalConsumerException>()
+            .Where(ex => ex.WorkerId == 1 && ex.Error == error);
+    }
+
+    [Fact]
+    public async Task ProcessBatchWithTimeoutAsync_ThrowsWhenProcessorDoesNotComplete()
+    {
+        var processor = new HangingProcessor();
+        var worker = CreateWorker(
+            new ExtendedConsumerSettings
+            {
+                BatchProcessingTimeoutMs = 10,
+                BatchTimeoutAction = ConsumerBatchTimeoutAction.CancelBatchAndFailWorker
+            },
+            processor: processor);
+        var accessor = worker.CreateTestAccessor();
+        var batch = KafkaRecordBatchFactory.CreateBatch(1);
+
+        var act = () => accessor.ProcessBatchWithTimeoutAsync(batch, CancellationToken.None);
+
+        await act.Should().ThrowAsync<KafkaBatchProcessingTimeoutException>()
+            .Where(ex => ex.WorkerId == 1 && ex.BatchSize == 1);
+        await processor.CancellationObserved.Task.WaitAsync(TimeSpan.FromSeconds(1));
+    }
+
     private static List<TopicPartition> CreatePartitions() => new()
     {
         new TopicPartition("topic", new Partition(0)),
@@ -167,7 +220,8 @@ public sealed class KafkaConsumerWorkerTests
 
     private static KafkaConsumerWorker CreateWorker(
         ExtendedConsumerSettings? settingsOverride = null,
-        IBackpressurePolicy? policy = null)
+        IBackpressurePolicy? policy = null,
+        IKafkaBatchProcessor? processor = null)
     {
         var settings = settingsOverride ?? new ExtendedConsumerSettings
         {
@@ -190,7 +244,7 @@ public sealed class KafkaConsumerWorkerTests
             topics: new[] { "topic" },
             config: config,
             settings: settings,
-            processor: new NoOpProcessor(),
+            processor: processor ?? new NoOpProcessor(),
             runtimeRecord: runtimeRecord,
             logger: NullLogger<KafkaConsumerWorker>.Instance,
             clock: clock,
@@ -200,6 +254,24 @@ public sealed class KafkaConsumerWorkerTests
     private sealed class NoOpProcessor : IKafkaBatchProcessor
     {
         public Task ProcessAsync(KafkaRecordBatch batch, CancellationToken cancellationToken) => Task.CompletedTask;
+    }
+
+    private sealed class HangingProcessor : IKafkaBatchProcessor
+    {
+        public TaskCompletionSource<object?> CancellationObserved { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public async Task ProcessAsync(KafkaRecordBatch batch, CancellationToken cancellationToken)
+        {
+            try
+            {
+                await Task.Delay(TimeSpan.FromMinutes(5), cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                CancellationObserved.TrySetResult(null);
+                throw;
+            }
+        }
     }
 
     private sealed class RecordingBackpressurePolicy : IBackpressurePolicy

@@ -71,6 +71,13 @@ public sealed class ExtendedConsumerSettings
     public int PollTimeoutMs { get; init; } = 100;
 
     /// <summary>
+    /// How long the Confluent consumer poll call blocks while the consumer is paused for backpressure.
+    /// This must still poll periodically so heartbeats, callbacks, commits, and rebalances are serviced.
+    /// Default: 1000 ms.
+    /// </summary>
+    public int PausedPollTimeoutMs { get; init; } = 1_000;
+
+    /// <summary>
     /// Maximum degree of parallelism for processing records within a single batch.
     /// 1 (default) = sequential. Set higher to process records in a batch concurrently
     /// when pipeline steps are thread-safe and I/O-bound.
@@ -80,7 +87,16 @@ public sealed class ExtendedConsumerSettings
     public bool IsolateConsumerCertificatePerThread { get; init; }
     public bool DuplicateCertificatePerWorker { get; init; }
     public int MaxInFlightBatches { get; init; } = 8;
+    public int BatchProcessingTimeoutMs { get; init; } = 300_000;
+    public ConsumerBatchTimeoutAction BatchTimeoutAction { get; init; } = ConsumerBatchTimeoutAction.FailWorker;
+    public int BackpressureSummaryLogIntervalMs { get; init; } = 30_000;
     public ConsumerBackpressureSettings Backpressure { get; init; } = new();
+}
+
+public enum ConsumerBatchTimeoutAction
+{
+    FailWorker,
+    CancelBatchAndFailWorker
 }
 
 public sealed class ConsumerBackpressureSettings

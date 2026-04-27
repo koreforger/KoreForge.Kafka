@@ -55,6 +55,31 @@ public sealed class KafkaConfigValidator : IKafkaConfigValidator
             result.Errors.Add("Extended.MaxBatchWaitMs must be at least 1.");
         }
 
+        if (config.Extended.PollTimeoutMs < 1)
+        {
+            result.Errors.Add("Extended.PollTimeoutMs must be at least 1.");
+        }
+
+        if (config.Extended.PausedPollTimeoutMs < 1)
+        {
+            result.Errors.Add("Extended.PausedPollTimeoutMs must be at least 1.");
+        }
+
+        if (config.Extended.MaxInFlightBatches < 1)
+        {
+            result.Errors.Add("Extended.MaxInFlightBatches must be at least 1.");
+        }
+
+        if (config.Extended.BatchProcessingTimeoutMs < 1)
+        {
+            result.Errors.Add("Extended.BatchProcessingTimeoutMs must be at least 1.");
+        }
+
+        if (config.Extended.BackpressureSummaryLogIntervalMs < 0)
+        {
+            result.Errors.Add("Extended.BackpressureSummaryLogIntervalMs cannot be negative.");
+        }
+
         if (config.Extended.DuplicateCertificatePerWorker && !config.Extended.IsolateConsumerCertificatePerThread)
         {
             result.Errors.Add("Extended.DuplicateCertificatePerWorker requires Extended.IsolateConsumerCertificatePerThread to be true.");
