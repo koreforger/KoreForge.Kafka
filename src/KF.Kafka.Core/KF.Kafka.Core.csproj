@@ -6,7 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\KoreForge.Time\src\KF.Time\KF.Time.csproj" />
+    <PackageReference Include="KoreForge.Time" />
   </ItemGroup>
 
 </Project>
+

@@ -19,7 +19,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\KF.Kafka.Consumer\KF.Kafka.Consumer.csproj" />
     <ProjectReference Include="..\..\src\KF.Kafka.Configuration\KF.Kafka.Configuration.csproj" />
-    <ProjectReference Include="..\..\..\KoreForge.Time\src\KF.Time\KF.Time.csproj" />
+    <PackageReference Include="KoreForge.Time" />
   </ItemGroup>
 
 </Project>
+

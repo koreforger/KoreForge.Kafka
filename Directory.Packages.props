@@ -13,7 +13,7 @@
         Version bump               : update the default value below and commit.
     -->
     <KoreForgeVersion Condition="'$(KOREFORGE_VERSION)' != ''">$(KOREFORGE_VERSION)</KoreForgeVersion>
-    <KoreForgeVersion Condition="'$(KoreForgeVersion)' == ''">0.0.8-alpha</KoreForgeVersion>
+    <KoreForgeVersion Condition="'$(KoreForgeVersion)' == ''">0.0.10-alpha</KoreForgeVersion>
   </PropertyGroup>
 
   <!-- KoreForge sibling packages -->
@@ -61,3 +61,4 @@
   </ItemGroup>
 
 </Project>
+

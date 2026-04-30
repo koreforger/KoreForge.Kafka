@@ -15,8 +15,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\KF.Kafka.Configuration\KF.Kafka.Configuration.csproj" />
-    <ProjectReference Include="..\..\..\KoreForge.Time\src\KF.Time\KF.Time.csproj" />
-    <ProjectReference Include="..\..\..\KoreForge.Metrics\src\KF.Metrics\KF.Metrics.csproj" />
+    <PackageReference Include="KoreForge.Time" />
+    <PackageReference Include="KoreForge.Metrics" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,3 +25,4 @@
   </ItemGroup>
 
 </Project>
+
