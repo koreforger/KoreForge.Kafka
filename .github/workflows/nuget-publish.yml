@@ -26,11 +26,11 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Build
-        run: dotnet build KoreForge.Kafka.sln -c Release
+        run: dotnet build KoreForge.Kafka.slnx -c Release
 
       - name: Test
         run: |
-          dotnet test KoreForge.Kafka.sln -c Release --no-build \
+          dotnet test KoreForge.Kafka.slnx -c Release --no-build \
             --filter "FullyQualifiedName!~IntegrationTests"
 
       - name: Pack

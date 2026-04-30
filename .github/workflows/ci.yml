@@ -94,36 +94,36 @@ jobs:
       - name: Build KoreForge.Time (dependency)
         if: env.KOREFORGE_VERSION == ''
         run: |
-          dotnet build dep/KoreForge.Time/KoreForge.Time.sln -c Release /p:MinVerSkip=true /p:Version=0.0.7-alpha /p:PackageVersion=0.0.7-alpha
-          dotnet pack  dep/KoreForge.Time/KoreForge.Time.sln -c Release --no-build /p:MinVerSkip=true /p:Version=0.0.7-alpha /p:PackageVersion=0.0.7-alpha
+          dotnet build dep/KoreForge.Time/KoreForge.Time.slnx -c Release /p:MinVerSkip=true /p:Version=0.0.7-alpha /p:PackageVersion=0.0.7-alpha
+          dotnet pack  dep/KoreForge.Time/KoreForge.Time.slnx -c Release --no-build /p:MinVerSkip=true /p:Version=0.0.7-alpha /p:PackageVersion=0.0.7-alpha
 
       - name: Build KoreForge.Metrics (dependency)
         if: env.KOREFORGE_VERSION == ''
         run: |
-          dotnet build dep/KoreForge.Metrics/KoreForge.Metrics.sln -c Release /p:MinVerSkip=true /p:Version=0.0.7-alpha /p:PackageVersion=0.0.7-alpha
-          dotnet pack  dep/KoreForge.Metrics/KoreForge.Metrics.sln -c Release --no-build /p:MinVerSkip=true /p:Version=0.0.7-alpha /p:PackageVersion=0.0.7-alpha
+          dotnet build dep/KoreForge.Metrics/KoreForge.Metrics.slnx -c Release /p:MinVerSkip=true /p:Version=0.0.7-alpha /p:PackageVersion=0.0.7-alpha
+          dotnet pack  dep/KoreForge.Metrics/KoreForge.Metrics.slnx -c Release --no-build /p:MinVerSkip=true /p:Version=0.0.7-alpha /p:PackageVersion=0.0.7-alpha
 
       - name: Build KoreForge.Logging (dependency)
         if: env.KOREFORGE_VERSION == ''
         run: |
-          dotnet build dep/KoreForge.Logging/KoreForge.Logging.sln -c Release /p:MinVerSkip=true /p:Version=0.0.7-alpha /p:PackageVersion=0.0.7-alpha
-          dotnet pack  dep/KoreForge.Logging/KoreForge.Logging.sln -c Release --no-build /p:MinVerSkip=true /p:Version=0.0.7-alpha /p:PackageVersion=0.0.7-alpha
+          dotnet build dep/KoreForge.Logging/KoreForge.Logging.slnx -c Release /p:MinVerSkip=true /p:Version=0.0.7-alpha /p:PackageVersion=0.0.7-alpha
+          dotnet pack  dep/KoreForge.Logging/KoreForge.Logging.slnx -c Release --no-build /p:MinVerSkip=true /p:Version=0.0.7-alpha /p:PackageVersion=0.0.7-alpha
 
       - name: Build KoreForge.Processing (dependency)
         if: env.KOREFORGE_VERSION == ''
         run: |
-          dotnet build dep/KoreForge.Processing/KoreForge.Processing.sln -c Release /p:MinVerSkip=true /p:Version=0.0.7-alpha /p:PackageVersion=0.0.7-alpha
-          dotnet pack  dep/KoreForge.Processing/KoreForge.Processing.sln -c Release --no-build /p:MinVerSkip=true /p:Version=0.0.7-alpha /p:PackageVersion=0.0.7-alpha
+          dotnet build dep/KoreForge.Processing/KoreForge.Processing.slnx -c Release /p:MinVerSkip=true /p:Version=0.0.7-alpha /p:PackageVersion=0.0.7-alpha
+          dotnet pack  dep/KoreForge.Processing/KoreForge.Processing.slnx -c Release --no-build /p:MinVerSkip=true /p:Version=0.0.7-alpha /p:PackageVersion=0.0.7-alpha
 
       - name: Restore
-        run: dotnet restore KoreForge.Kafka.sln
+        run: dotnet restore KoreForge.Kafka.slnx
 
       - name: Build
-        run: dotnet build KoreForge.Kafka.sln -c Release --no-restore
+        run: dotnet build KoreForge.Kafka.slnx -c Release --no-restore
 
       - name: Run unit tests (exclude integration)
         run: |
-          dotnet test KoreForge.Kafka.sln -c Release --no-build \
+          dotnet test KoreForge.Kafka.slnx -c Release --no-build \
             --filter "FullyQualifiedName!~IntegrationTests" \
             --logger "trx;LogFileName=UnitTestResults.trx" \
             --results-directory ./out/TestResults \
