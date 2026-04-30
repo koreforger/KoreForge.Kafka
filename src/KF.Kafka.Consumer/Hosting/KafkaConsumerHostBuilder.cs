@@ -32,6 +32,7 @@ public sealed class KafkaConsumerHostBuilder
     private IRestartPolicy _restartPolicy = new FixedRetryRestartPolicy();
     private Func<IPipelineMetrics> _pipelineMetricsFactory = static () => NoOpPipelineMetrics.Instance;
     private IKafkaPipelineIntegrationMetrics _pipelineIntegrationMetrics = NoOpKafkaPipelineIntegrationMetrics.Instance;
+    private IKafkaConsumerLifecycleObserver? _lifecycleObserver;
     private string _pipelineName = "kafka-consumer-pipeline";
 
     public KafkaConsumerHostBuilder UseKafkaConfigurationProfile(string profileName, IKafkaClientConfigFactory factory)
@@ -91,6 +92,12 @@ public sealed class KafkaConsumerHostBuilder
     public KafkaConsumerHostBuilder UseRestartPolicy(IRestartPolicy policy)
     {
         _restartPolicy = policy ?? throw new ArgumentNullException(nameof(policy));
+        return this;
+    }
+
+    public KafkaConsumerHostBuilder UseConsumerLifecycleObserver(IKafkaConsumerLifecycleObserver observer)
+    {
+        _lifecycleObserver = observer ?? throw new ArgumentNullException(nameof(observer));
         return this;
     }
 
@@ -168,7 +175,15 @@ public sealed class KafkaConsumerHostBuilder
 
         var backpressurePolicy = _backpressurePolicy ?? CreateBackpressurePolicy(runtime.Extended, _loggerFactory);
         var runtimeState = new KafkaConsumerRuntimeState(runtime.Extended.ConsumerCount);
-        var supervisor = new KafkaConsumerSupervisor(runtime, _processorFactory, runtimeState, _loggerFactory, _clock, backpressurePolicy, _restartPolicy);
+        var supervisor = new KafkaConsumerSupervisor(
+            runtime,
+            _processorFactory,
+            runtimeState,
+            _loggerFactory,
+            _clock,
+            backpressurePolicy,
+            _restartPolicy,
+            lifecycleObserver: _lifecycleObserver);
         return new KafkaConsumerHost(supervisor, runtimeState, _loggerFactory);
     }
 

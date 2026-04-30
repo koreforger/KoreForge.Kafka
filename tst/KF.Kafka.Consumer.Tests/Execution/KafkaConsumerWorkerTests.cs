@@ -41,6 +41,37 @@ public sealed class KafkaConsumerWorkerTests
     }
 
     [Fact]
+    public void HandlePartitionsAssigned_NotifiesLifecycleObserver()
+    {
+        var observer = new RecordingLifecycleObserver();
+        var worker = CreateWorker(observer: observer);
+        var accessor = worker.CreateTestAccessor();
+        var consumer = new Mock<IConsumer<byte[], byte[]>>();
+        var partitions = CreatePartitions();
+
+        accessor.HandlePartitionsAssigned(consumer.Object, partitions).ToList();
+
+        observer.Assigned.Should().ContainSingle();
+        observer.Assigned[0].WorkerId.Should().Be(1);
+        observer.Assigned[0].Partitions.Should().Equal(partitions);
+    }
+
+    [Fact]
+    public void NotifyPartitionsRevoked_NotifiesLifecycleObserver()
+    {
+        var observer = new RecordingLifecycleObserver();
+        var worker = CreateWorker(observer: observer);
+        var accessor = worker.CreateTestAccessor();
+        var partitions = CreatePartitions();
+
+        accessor.NotifyPartitionsRevoked(partitions);
+
+        observer.Revoked.Should().ContainSingle();
+        observer.Revoked[0].WorkerId.Should().Be(1);
+        observer.Revoked[0].Partitions.Should().Equal(partitions);
+    }
+
+    [Fact]
     public void HandlePartitionsAssigned_PausesWhenRequested()
     {
         var worker = CreateWorker(new ExtendedConsumerSettings
@@ -221,7 +252,8 @@ public sealed class KafkaConsumerWorkerTests
     private static KafkaConsumerWorker CreateWorker(
         ExtendedConsumerSettings? settingsOverride = null,
         IBackpressurePolicy? policy = null,
-        IKafkaBatchProcessor? processor = null)
+        IKafkaBatchProcessor? processor = null,
+        IKafkaConsumerLifecycleObserver? observer = null)
     {
         var settings = settingsOverride ?? new ExtendedConsumerSettings
         {
@@ -248,7 +280,8 @@ public sealed class KafkaConsumerWorkerTests
             runtimeRecord: runtimeRecord,
             logger: NullLogger<KafkaConsumerWorker>.Instance,
             clock: clock,
-            backpressurePolicy: policy ?? new ThresholdBackpressurePolicy(0.8, 0.4));
+            backpressurePolicy: policy ?? new ThresholdBackpressurePolicy(0.8, 0.4),
+            lifecycleObserver: observer);
     }
 
     private sealed class NoOpProcessor : IKafkaBatchProcessor
@@ -290,5 +323,16 @@ public sealed class KafkaConsumerWorkerTests
             Contexts.Add(context);
             return _decisions.Count > 0 ? _decisions.Dequeue() : BackpressureDecision.None;
         }
+    }
+
+    private sealed class RecordingLifecycleObserver : IKafkaConsumerLifecycleObserver
+    {
+        public List<KafkaConsumerLifecycleEvent> Assigned { get; } = new();
+
+        public List<KafkaConsumerLifecycleEvent> Revoked { get; } = new();
+
+        public void OnPartitionsAssigned(KafkaConsumerLifecycleEvent lifecycleEvent) => Assigned.Add(lifecycleEvent);
+
+        public void OnPartitionsRevoked(KafkaConsumerLifecycleEvent lifecycleEvent) => Revoked.Add(lifecycleEvent);
     }
 }

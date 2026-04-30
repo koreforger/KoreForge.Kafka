@@ -26,6 +26,7 @@ internal sealed class KafkaConsumerWorker : IKafkaConsumerWorker
     private readonly WorkerLogger<KafkaConsumerWorker> _logs;
     private readonly ISystemClock _clock;
     private readonly IBackpressurePolicy _backpressurePolicy;
+    private readonly IKafkaConsumerLifecycleObserver? _lifecycleObserver;
     private readonly List<PendingBatch> _pendingBatches = new();
     private readonly int _maxInFlightBatches;
     private readonly object _assignmentLock = new();
@@ -51,6 +52,7 @@ internal sealed class KafkaConsumerWorker : IKafkaConsumerWorker
         ILogger<KafkaConsumerWorker> logger,
         ISystemClock clock,
         IBackpressurePolicy backpressurePolicy,
+        IKafkaConsumerLifecycleObserver? lifecycleObserver = null,
         Action? onBatchSuccess = null)
     {
         _workerIndex = workerIndex;
@@ -61,6 +63,7 @@ internal sealed class KafkaConsumerWorker : IKafkaConsumerWorker
         _runtimeRecord = runtimeRecord ?? throw new ArgumentNullException(nameof(runtimeRecord));
         _clock = clock ?? SystemClock.Instance;
         _backpressurePolicy = backpressurePolicy ?? throw new ArgumentNullException(nameof(backpressurePolicy));
+        _lifecycleObserver = lifecycleObserver;
         _logs = new WorkerLogger<KafkaConsumerWorker>(logger ?? throw new ArgumentNullException(nameof(logger)));
         _maxInFlightBatches = settings.MaxInFlightBatches <= 0 ? 1 : settings.MaxInFlightBatches;
         _onBatchSuccess = onBatchSuccess;
@@ -267,6 +270,7 @@ internal sealed class KafkaConsumerWorker : IKafkaConsumerWorker
             .SetPartitionsRevokedHandler((_, partitions) =>
             {
                 _logs.Status.Stopping.LogInformation("Worker {WorkerId} partitions revoked ({PartitionCount})", WorkerId, partitions.Count);
+                NotifyPartitionsRevoked(partitions.Select(partition => partition.TopicPartition).ToArray());
                 lock (_assignmentLock)
                 {
                     _assignedPartitions = new List<TopicPartition>();
@@ -284,6 +288,7 @@ internal sealed class KafkaConsumerWorker : IKafkaConsumerWorker
         List<TopicPartition> partitions)
     {
         _logs.Status.Started.LogInformation("Worker {WorkerId} partitions assigned ({PartitionCount})", WorkerId, partitions.Count);
+        NotifyPartitionsAssigned(partitions);
         lock (_assignmentLock)
         {
             _assignedPartitions = partitions.ToList();
@@ -315,6 +320,40 @@ internal sealed class KafkaConsumerWorker : IKafkaConsumerWorker
         };
 
         return partitions.Select(partition => new TopicPartitionOffset(partition, offset)).ToArray();
+    }
+
+    private void NotifyPartitionsAssigned(IReadOnlyList<TopicPartition> partitions)
+    {
+        if (_lifecycleObserver is null)
+        {
+            return;
+        }
+
+        try
+        {
+            _lifecycleObserver.OnPartitionsAssigned(new KafkaConsumerLifecycleEvent(WorkerId, partitions.ToArray(), _clock.UtcNow));
+        }
+        catch (Exception ex)
+        {
+            _logs.Status.Started.LogWarning(ex, "Worker {WorkerId} lifecycle observer failed while recording assigned partitions", WorkerId);
+        }
+    }
+
+    private void NotifyPartitionsRevoked(IReadOnlyList<TopicPartition> partitions)
+    {
+        if (_lifecycleObserver is null)
+        {
+            return;
+        }
+
+        try
+        {
+            _lifecycleObserver.OnPartitionsRevoked(new KafkaConsumerLifecycleEvent(WorkerId, partitions.ToArray(), _clock.UtcNow));
+        }
+        catch (Exception ex)
+        {
+            _logs.Status.Stopping.LogWarning(ex, "Worker {WorkerId} lifecycle observer failed while recording revoked partitions", WorkerId);
+        }
     }
 
     private IEnumerable<TopicPartitionOffset> ResolveRelativeAssignments(
@@ -636,6 +675,8 @@ internal sealed class KafkaConsumerWorker : IKafkaConsumerWorker
         internal IEnumerable<TopicPartitionOffset> HandlePartitionsAssigned(
             IConsumer<byte[], byte[]> consumer,
             List<TopicPartition> partitions) => _owner.HandlePartitionsAssigned(consumer, partitions);
+
+        internal void NotifyPartitionsRevoked(IReadOnlyList<TopicPartition> partitions) => _owner.NotifyPartitionsRevoked(partitions);
 
         internal IEnumerable<TopicPartitionOffset> ResolveRelativeAssignments(
             IConsumer<byte[], byte[]> consumer,

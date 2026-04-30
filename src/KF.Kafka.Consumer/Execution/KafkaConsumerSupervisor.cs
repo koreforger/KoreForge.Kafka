@@ -32,6 +32,7 @@ internal sealed class KafkaConsumerSupervisor : IAsyncDisposable
     private readonly ISystemClock _clock;
     private readonly IBackpressurePolicy _backpressurePolicy;
     private readonly IRestartPolicy _restartPolicy;
+    private readonly IKafkaConsumerLifecycleObserver? _lifecycleObserver;
     private readonly Func<KafkaConsumerWorkerCreationContext, IKafkaConsumerWorker> _workerFactory;
     private bool _started;
 
@@ -43,7 +44,8 @@ internal sealed class KafkaConsumerSupervisor : IAsyncDisposable
         ISystemClock clock,
         IBackpressurePolicy backpressurePolicy,
         IRestartPolicy restartPolicy,
-        Func<KafkaConsumerWorkerCreationContext, IKafkaConsumerWorker>? workerFactory = null)
+        Func<KafkaConsumerWorkerCreationContext, IKafkaConsumerWorker>? workerFactory = null,
+        IKafkaConsumerLifecycleObserver? lifecycleObserver = null)
     {
         _runtimeConfig = runtimeConfig ?? throw new ArgumentNullException(nameof(runtimeConfig));
         _processorFactory = processorFactory ?? throw new ArgumentNullException(nameof(processorFactory));
@@ -52,6 +54,7 @@ internal sealed class KafkaConsumerSupervisor : IAsyncDisposable
         _clock = clock ?? SystemClock.Instance;
         _backpressurePolicy = backpressurePolicy ?? throw new ArgumentNullException(nameof(backpressurePolicy));
         _restartPolicy = restartPolicy ?? throw new ArgumentNullException(nameof(restartPolicy));
+        _lifecycleObserver = lifecycleObserver;
         _workerFactory = workerFactory ?? CreateWorker;
 
         var supervisorLogger = _loggerFactory.CreateLogger<KafkaConsumerSupervisor>();
@@ -258,6 +261,7 @@ internal sealed class KafkaConsumerSupervisor : IAsyncDisposable
             workerLogger,
             _clock,
             _backpressurePolicy,
+            _lifecycleObserver,
             () => context.ResetFailures(instanceId));
     }
 
