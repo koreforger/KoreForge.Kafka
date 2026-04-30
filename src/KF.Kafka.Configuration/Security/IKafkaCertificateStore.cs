@@ -37,7 +37,7 @@ public sealed class FileKafkaCertificateStore : IKafkaCertificateStore
     public FileKafkaCertificateStore(ILogger<FileKafkaCertificateStore> logger)
     {
         _logger = logger;
-        _rootDirectory = Path.Combine(Path.GetTempPath(), "khaos-kafka-certs");
+        _rootDirectory = Path.Combine(Path.GetTempPath(), "koreforge-kafka-certs");
         Directory.CreateDirectory(_rootDirectory);
     }
 

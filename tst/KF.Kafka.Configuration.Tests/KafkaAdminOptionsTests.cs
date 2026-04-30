@@ -15,7 +15,7 @@ public sealed class KafkaAdminOptionsTests
         options.ClientId.Should().BeNull();
         options.RequestTimeoutMs.Should().Be(10_000);
         options.MaxDegreeOfParallelism.Should().BeGreaterThan(0);
-        options.InternalConsumerGroupPrefix.Should().Be("khaos-admin");
+        options.InternalConsumerGroupPrefix.Should().Be("koreforge-admin");
 
         options.Retry.Should().NotBeNull();
         options.Cache.Should().NotBeNull();

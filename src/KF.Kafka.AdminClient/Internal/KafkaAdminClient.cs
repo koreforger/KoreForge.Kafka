@@ -361,7 +361,7 @@ internal sealed class KafkaAdminClient : IKafkaAdminClient
         {
             BootstrapServers = options.BootstrapServers,
             ClientId = string.IsNullOrWhiteSpace(options.ClientId)
-                ? $"khaos-admin-{Environment.MachineName}"
+                ? $"koreforge-admin-{Environment.MachineName}"
                 : options.ClientId,
             SocketTimeoutMs = options.RequestTimeoutMs,
         };

@@ -14,7 +14,7 @@ public sealed class KafkaAdminOptions
     public string BootstrapServers { get; set; } = string.Empty;
 
     /// <summary>
-    /// Optional logical client identifier. Defaults to a deterministic "khaos-admin" prefix.
+    /// Optional logical client identifier. Defaults to a deterministic "koreforge-admin" prefix.
     /// </summary>
     public string? ClientId { get; set; }
 
@@ -33,7 +33,7 @@ public sealed class KafkaAdminOptions
     /// <summary>
     /// Optional prefix used when the admin client opens short-lived consumers for metadata queries.
     /// </summary>
-    public string InternalConsumerGroupPrefix { get; set; } = "khaos-admin";
+    public string InternalConsumerGroupPrefix { get; set; } = "koreforge-admin";
 
     public KafkaAdminRetryOptions Retry { get; init; } = new();
 

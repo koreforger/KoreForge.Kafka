@@ -279,7 +279,7 @@ internal sealed class KafkaConsumerSupervisor : IAsyncDisposable
 
     private static string BuildClientId(string? baseClientId, int workerIndex)
     {
-        var prefix = string.IsNullOrWhiteSpace(baseClientId) ? "khaos-consumer" : baseClientId;
+        var prefix = string.IsNullOrWhiteSpace(baseClientId) ? "koreforge-consumer" : baseClientId;
         return $"{prefix}-w{workerIndex + 1}";
     }
 

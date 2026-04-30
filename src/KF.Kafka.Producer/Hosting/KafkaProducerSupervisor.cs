@@ -189,7 +189,7 @@ internal sealed class KafkaProducerSupervisor : IAsyncDisposable
 
     private static string BuildClientId(string? baseClientId, int workerId)
     {
-        var prefix = string.IsNullOrWhiteSpace(baseClientId) ? "khaos-producer" : baseClientId;
+        var prefix = string.IsNullOrWhiteSpace(baseClientId) ? "koreforge-producer" : baseClientId;
         return $"{prefix}-w{workerId + 1}";
     }
 

@@ -26,7 +26,7 @@ foreach ($task in $tasks)
     }
 
     $invocation = "& `"$scriptPath`" $($task.Arguments)"
-    $command = "& { $Host.UI.RawUI.WindowTitle = 'Khaos Docker - $($task.Title)'; Set-Location `"$scriptDir`"; Write-Host `"*** $($task.Title) ***`"; $invocation; Write-Host `"--- Completed $($task.Title). Press Enter to close this window. ---`"; Read-Host }"
+    $command = "& { $Host.UI.RawUI.WindowTitle = 'KoreForge Docker - $($task.Title)'; Set-Location `"$scriptDir`"; Write-Host `"*** $($task.Title) ***`"; $invocation; Write-Host `"--- Completed $($task.Title). Press Enter to close this window. ---`"; Read-Host }"
 
     Start-Process powershell -ArgumentList '-NoExit', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', $command -WindowStyle Normal
     Start-Sleep -Seconds 1

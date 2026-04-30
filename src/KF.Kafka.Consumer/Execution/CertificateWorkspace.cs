@@ -28,7 +28,7 @@ internal sealed class CertificateWorkspace : IAsyncDisposable
         _baselineConfig = baselineConfig ?? throw new ArgumentNullException(nameof(baselineConfig));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _logs = new CertificatesLogger<CertificateWorkspace>(logger ?? throw new ArgumentNullException(nameof(logger)));
-        _rootDirectory = Path.Combine(Path.GetTempPath(), "khaos-kafka-consumer", Guid.NewGuid().ToString("N"));
+        _rootDirectory = Path.Combine(Path.GetTempPath(), "koreforge-kafka-consumer", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(_rootDirectory);
         _logs.Isolation.Configured.LogInformation("Certificate workspace prepared at {Path}", _rootDirectory);
     }
