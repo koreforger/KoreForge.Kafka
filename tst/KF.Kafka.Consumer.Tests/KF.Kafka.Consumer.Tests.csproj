@@ -17,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\KF.Kafka.Consumer\KF.Kafka.Consumer.csproj" />
-    <ProjectReference Include="..\..\src\KF.Kafka.Configuration\KF.Kafka.Configuration.csproj" />
+    <PackageReference Include="KF.Kafka.Consumer" VersionOverride="1.0.1-alpha" />
+    <PackageReference Include="KF.Kafka.Configuration" VersionOverride="1.0.1-alpha" />
     <PackageReference Include="KoreForge.Time" />
   </ItemGroup>
 

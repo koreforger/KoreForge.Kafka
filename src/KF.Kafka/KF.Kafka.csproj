@@ -36,12 +36,12 @@
 
   <!-- Project references ensure correct build order -->
   <ItemGroup>
-    <ProjectReference Include="../KF.Kafka.AdminClient/KF.Kafka.AdminClient.csproj" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="../KF.Kafka.Configuration/KF.Kafka.Configuration.csproj" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="../KF.Kafka.Configuration.AspNetCore/KF.Kafka.Configuration.AspNetCore.csproj" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="../KF.Kafka.Consumer/KF.Kafka.Consumer.csproj" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="../KF.Kafka.Core/KF.Kafka.Core.csproj" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="../KF.Kafka.Producer/KF.Kafka.Producer.csproj" ReferenceOutputAssembly="false" />
+    <PackageReference Include="KF.Kafka.AdminClient" VersionOverride="1.0.1-alpha" />
+    <PackageReference Include="KF.Kafka.Configuration" VersionOverride="1.0.1-alpha" />
+    <PackageReference Include="KF.Kafka.Configuration.AspNetCore" VersionOverride="1.0.1-alpha" />
+    <PackageReference Include="KF.Kafka.Consumer" VersionOverride="1.0.1-alpha" />
+    <PackageReference Include="KF.Kafka.Core" VersionOverride="1.0.1-alpha" />
+    <PackageReference Include="KF.Kafka.Producer" VersionOverride="1.0.1-alpha" />
   </ItemGroup>
 
   <!-- Explicit list of assemblies and XML docs to bundle in the package -->

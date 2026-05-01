@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\KF.Kafka.AdminClient\KF.Kafka.AdminClient.csproj" />
+    <PackageReference Include="KF.Kafka.AdminClient" VersionOverride="1.0.1-alpha" />
     <PackageReference Include="KoreForge.Time" />
   </ItemGroup>
 

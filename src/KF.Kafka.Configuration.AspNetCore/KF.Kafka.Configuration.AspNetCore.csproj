@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../KF.Kafka.Configuration/KF.Kafka.Configuration.csproj" />
+    <PackageReference Include="KF.Kafka.Configuration" VersionOverride="1.0.1-alpha" />
   </ItemGroup>
 
 </Project>

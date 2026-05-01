@@ -18,8 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\KF.Kafka.Producer\KF.Kafka.Producer.csproj" />
-    <ProjectReference Include="..\..\src\KF.Kafka.Configuration\KF.Kafka.Configuration.csproj" />
+    <PackageReference Include="KF.Kafka.Producer" VersionOverride="1.0.1-alpha" />
+    <PackageReference Include="KF.Kafka.Configuration" VersionOverride="1.0.1-alpha" />
   </ItemGroup>
 
 </Project>
