@@ -1,11 +1,9 @@
 [CmdletBinding()]
-param()
+param(
+    [ValidateSet('Debug', 'Release')]
+    [string]$Configuration = 'Debug'
+)
 
-Push-Location (Resolve-Path "$PSScriptRoot\..")
-try {
-    dotnet clean KoreForge.Kafka.slnx --verbosity minimal
-    Remove-Item 'out' -Recurse -Force -ErrorAction SilentlyContinue
-    Write-Host 'Clean complete.' -ForegroundColor Green
-} finally {
-    Pop-Location
-}
+Import-Module (Join-Path $PSScriptRoot 'koreforge-build.psm1') -Force -DisableNameChecking
+Invoke-KfClean -Configuration $Configuration
+

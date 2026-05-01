@@ -1,15 +1,9 @@
 [CmdletBinding()]
 param(
+    [ValidateSet('Debug', 'Release')]
     [string]$Configuration = 'Debug'
 )
 
-Push-Location (Resolve-Path "$PSScriptRoot\..")
-try {
-    dotnet build KoreForge.Kafka.slnx --force -c $Configuration
-    dotnet test  KoreForge.Kafka.slnx -c $Configuration --no-build `
-        --logger "html;LogFileName=TestResults.html" `
-        --results-directory out/TestResults
-    Write-Host 'Test results: out/TestResults/TestResults.html' -ForegroundColor Green
-} finally {
-    Pop-Location
-}
+Import-Module (Join-Path $PSScriptRoot 'koreforge-build.psm1') -Force -DisableNameChecking
+Invoke-KfTest -Configuration $Configuration
+
