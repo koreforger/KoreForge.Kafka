@@ -6,26 +6,26 @@ A production-grade Kafka client stack for .NET 10, built on [Confluent.Kafka](ht
 
 | Package | Description |
 |---|---|
-| `KF.Kafka` | Meta-package — installs all components below |
-| `KF.Kafka.AdminClient` | Read-only admin surface: topic metadata, consumer-lag, offsets-for-timestamp |
-| `KF.Kafka.Configuration` | Configuration model, profiles, validation, generated factories |
-| `KF.Kafka.Configuration.AspNetCore` | ASP.NET Core integration for configuration |
-| `KF.Kafka.Consumer` | Resilient consumer host with backpressure, routing, pipeline, and restart |
-| `KF.Kafka.Core` | Shared runtime records, alert engine, and diagnostics |
-| `KF.Kafka.Producer` | Resilient producer host with buffering, backpressure, backlog, and metrics |
+| `KoreForge.Kafka` | Meta-package — installs all components below |
+| `KoreForge.Kafka.AdminClient` | Read-only admin surface: topic metadata, consumer-lag, offsets-for-timestamp |
+| `KoreForge.Kafka.Configuration` | Configuration model, profiles, validation, generated factories |
+| `KoreForge.Kafka.Configuration.AspNetCore` | ASP.NET Core integration for configuration |
+| `KoreForge.Kafka.Consumer` | Resilient consumer host with backpressure, routing, pipeline, and restart |
+| `KoreForge.Kafka.Core` | Shared runtime records, alert engine, and diagnostics |
+| `KoreForge.Kafka.Producer` | Resilient producer host with buffering, backpressure, backlog, and metrics |
 
 ## Quick start
 
 Install the meta-package to get everything:
 ```
-dotnet add package KF.Kafka
+dotnet add package KoreForge.Kafka
 ```
 
 Or install individual packages for leaner dependencies:
 ```
-dotnet add package KF.Kafka.Consumer
-dotnet add package KF.Kafka.Producer
-dotnet add package KF.Kafka.AdminClient
+dotnet add package KoreForge.Kafka.Consumer
+dotnet add package KoreForge.Kafka.Producer
+dotnet add package KoreForge.Kafka.AdminClient
 ```
 
 See [doc/UsageGuide.md](doc/UsageGuide.md) for detailed usage examples.
@@ -69,22 +69,22 @@ The `samples/docker` directory contains a Docker Compose setup with:
 
 ```
 src/
-  KF.Kafka/                           Meta-package (bundles all components)
-  KF.Kafka.AdminClient/               Admin client library
-  KF.Kafka.Configuration/             Configuration library
-  KF.Kafka.Configuration.AspNetCore/  ASP.NET Core configuration extension
-  KF.Kafka.Consumer/                  Consumer library
-  KF.Kafka.Core/                      Core shared types
-  KF.Kafka.Producer/                  Producer library
+  KoreForge.Kafka/                           Meta-package (bundles all components)
+  KoreForge.Kafka.AdminClient/               Admin client library
+  KoreForge.Kafka.Configuration/             Configuration library
+  KoreForge.Kafka.Configuration.AspNetCore/  ASP.NET Core configuration extension
+  KoreForge.Kafka.Consumer/                  Consumer library
+  KoreForge.Kafka.Core/                      Core shared types
+  KoreForge.Kafka.Producer/                  Producer library
 tst/
-  KF.Kafka.AdminClient.Tests/
-  KF.Kafka.AdminClient.IntegrationTests/
-  KF.Kafka.Configuration.Tests/
-  KF.Kafka.Consumer.Tests/
-  KF.Kafka.Consumer.IntegrationTests/
-  KF.Kafka.Core.Tests/
-  KF.Kafka.Producer.Tests/
-  KF.Kafka.Producer.IntegrationTests/
+  KoreForge.Kafka.AdminClient.Tests/
+  KoreForge.Kafka.AdminClient.IntegrationTests/
+  KoreForge.Kafka.Configuration.Tests/
+  KoreForge.Kafka.Consumer.Tests/
+  KoreForge.Kafka.Consumer.IntegrationTests/
+  KoreForge.Kafka.Core.Tests/
+  KoreForge.Kafka.Producer.Tests/
+  KoreForge.Kafka.Producer.IntegrationTests/
 samples/
   docker/                             Local dev infrastructure (Redpanda + SQL)
 scr/

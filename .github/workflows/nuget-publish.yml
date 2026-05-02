@@ -34,7 +34,7 @@ jobs:
             --filter "FullyQualifiedName!~IntegrationTests"
 
       - name: Pack
-        run: dotnet pack src/KF.Kafka/KF.Kafka.csproj -c Release --no-build -o artifacts/
+        run: dotnet pack src/KoreForge.Kafka/KoreForge.Kafka.csproj -c Release --no-build -o artifacts/
 
       - name: Push to NuGet.org
         run: |

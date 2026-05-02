@@ -1,4 +1,4 @@
-﻿[CmdletBinding()]
+[CmdletBinding()]
 param(
     [string]$TopicName = 'sample-messages',
     [string]$SaPassword = 'YourStrong!Passw0rd'
@@ -6,8 +6,8 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$redpanda = 'kf-kafka-redpanda'
-$sqledge = 'kf-kafka-sqledge'
+$redpanda = 'koreforge-kafka-redpanda'
+$sqledge = 'koreforge-kafka-sqledge'
 
 function Wait-ContainerReady {
     param(

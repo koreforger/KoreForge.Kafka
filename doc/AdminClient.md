@@ -1,4 +1,4 @@
-﻿# KF.Kafka.AdminClient
+# KoreForge.Kafka.AdminClient
 
 Read-only Kafka administration surface used by the consumer / producer hosts. The library intentionally mirrors the conventions described in `docs/Kafka Admin Client.md`.
 
@@ -28,7 +28,7 @@ var lag = await admin.GetConsumerGroupLagSummaryAsync(
 
 ### Using Kafka configuration profiles
 
-If your application already binds the shared `KF.Kafka.Configuration` package, feed the validated profile straight into the builder:
+If your application already binds the shared `KoreForge.Kafka.Configuration` package, feed the validated profile straight into the builder:
 
 ```csharp
 var configFactory = services.BuildServiceProvider().GetRequiredService<IKafkaClientConfigFactory>();
@@ -45,7 +45,7 @@ var adminClient = KafkaAdminClientHost
 
 ### Metrics
 
-`AddKafkaAdminClient` will reuse any registered `IOperationMonitor` (from `KF.Metrics`) and emit the following operations out-of-the-box:
+`AddKafkaAdminClient` will reuse any registered `IOperationMonitor` (from `KoreForge.Metrics`) and emit the following operations out-of-the-box:
 
 - `kafka.admin.metadata`, `kafka.admin.lag`, `kafka.admin.offsets-for-timestamp` – duration + failure tracking for each broker call.
 - `kafka.admin.errors` – per-operation error counters tagged with the exception type.

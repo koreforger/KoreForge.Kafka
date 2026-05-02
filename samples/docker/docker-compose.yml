@@ -1,7 +1,7 @@
-﻿services:
+services:
   redpanda:
     image: redpandadata/redpanda:v24.1.2
-    container_name: kf-kafka-redpanda
+    container_name: koreforge-kafka-redpanda
     command:
       - redpanda
       - start
@@ -32,7 +32,7 @@
 
   sqledge:
     image: mcr.microsoft.com/azure-sql-edge:latest
-    container_name: kf-kafka-sqledge
+    container_name: koreforge-kafka-sqledge
     environment:
       ACCEPT_EULA: "1"
       MSSQL_SA_PASSWORD: "YourStrong!Passw0rd"

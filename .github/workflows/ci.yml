@@ -140,21 +140,21 @@ jobs:
       # is alive at a time — avoids Docker resource contention.
       - name: Run AdminClient integration tests
         run: |
-          dotnet test tst/KF.Kafka.AdminClient.IntegrationTests/KF.Kafka.AdminClient.IntegrationTests.csproj \
+          dotnet test tst/KoreForge.Kafka.AdminClient.IntegrationTests/KoreForge.Kafka.AdminClient.IntegrationTests.csproj \
             -c Release --no-build \
             --logger "trx;LogFileName=AdminClientIntegrationTestResults.trx" \
             --results-directory ./out/TestResults
 
       - name: Run Consumer integration tests
         run: |
-          dotnet test tst/KF.Kafka.Consumer.IntegrationTests/KF.Kafka.Consumer.IntegrationTests.csproj \
+          dotnet test tst/KoreForge.Kafka.Consumer.IntegrationTests/KoreForge.Kafka.Consumer.IntegrationTests.csproj \
             -c Release --no-build \
             --logger "trx;LogFileName=ConsumerIntegrationTestResults.trx" \
             --results-directory ./out/TestResults
 
       - name: Run Producer integration tests
         run: |
-          dotnet test tst/KF.Kafka.Producer.IntegrationTests/KF.Kafka.Producer.IntegrationTests.csproj \
+          dotnet test tst/KoreForge.Kafka.Producer.IntegrationTests/KoreForge.Kafka.Producer.IntegrationTests.csproj \
             -c Release --no-build \
             --logger "trx;LogFileName=ProducerIntegrationTestResults.trx" \
             --results-directory ./out/TestResults

@@ -1,21 +1,21 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/KF.Kafka.AdminClient/KF.Kafka.AdminClient.csproj" />
-    <Project Path="src/KF.Kafka.Configuration.AspNetCore/KF.Kafka.Configuration.AspNetCore.csproj" />
-    <Project Path="src/KF.Kafka.Configuration/KF.Kafka.Configuration.csproj" />
-    <Project Path="src/KF.Kafka.Consumer/KF.Kafka.Consumer.csproj" />
-    <Project Path="src/KF.Kafka.Core/KF.Kafka.Core.csproj" />
-    <Project Path="src/KF.Kafka.Producer/KF.Kafka.Producer.csproj" />
-    <Project Path="src/KF.Kafka/KF.Kafka.csproj" />
+    <Project Path="src/KoreForge.Kafka.AdminClient/KoreForge.Kafka.AdminClient.csproj" />
+    <Project Path="src/KoreForge.Kafka.Configuration.AspNetCore/KoreForge.Kafka.Configuration.AspNetCore.csproj" />
+    <Project Path="src/KoreForge.Kafka.Configuration/KoreForge.Kafka.Configuration.csproj" />
+    <Project Path="src/KoreForge.Kafka.Consumer/KoreForge.Kafka.Consumer.csproj" />
+    <Project Path="src/KoreForge.Kafka.Core/KoreForge.Kafka.Core.csproj" />
+    <Project Path="src/KoreForge.Kafka.Producer/KoreForge.Kafka.Producer.csproj" />
+    <Project Path="src/KoreForge.Kafka/KoreForge.Kafka.csproj" />
   </Folder>
   <Folder Name="/tst/">
-    <Project Path="tst/KF.Kafka.AdminClient.IntegrationTests/KF.Kafka.AdminClient.IntegrationTests.csproj" />
-    <Project Path="tst/KF.Kafka.AdminClient.Tests/KF.Kafka.AdminClient.Tests.csproj" />
-    <Project Path="tst/KF.Kafka.Configuration.Tests/KF.Kafka.Configuration.Tests.csproj" />
-    <Project Path="tst/KF.Kafka.Consumer.IntegrationTests/KF.Kafka.Consumer.IntegrationTests.csproj" />
-    <Project Path="tst/KF.Kafka.Consumer.Tests/KF.Kafka.Consumer.Tests.csproj" />
-    <Project Path="tst/KF.Kafka.Core.Tests/KF.Kafka.Core.Tests.csproj" />
-    <Project Path="tst/KF.Kafka.Producer.IntegrationTests/KF.Kafka.Producer.IntegrationTests.csproj" />
-    <Project Path="tst/KF.Kafka.Producer.Tests/KF.Kafka.Producer.Tests.csproj" />
+    <Project Path="tst/KoreForge.Kafka.AdminClient.IntegrationTests/KoreForge.Kafka.AdminClient.IntegrationTests.csproj" />
+    <Project Path="tst/KoreForge.Kafka.AdminClient.Tests/KoreForge.Kafka.AdminClient.Tests.csproj" />
+    <Project Path="tst/KoreForge.Kafka.Configuration.Tests/KoreForge.Kafka.Configuration.Tests.csproj" />
+    <Project Path="tst/KoreForge.Kafka.Consumer.IntegrationTests/KoreForge.Kafka.Consumer.IntegrationTests.csproj" />
+    <Project Path="tst/KoreForge.Kafka.Consumer.Tests/KoreForge.Kafka.Consumer.Tests.csproj" />
+    <Project Path="tst/KoreForge.Kafka.Core.Tests/KoreForge.Kafka.Core.Tests.csproj" />
+    <Project Path="tst/KoreForge.Kafka.Producer.IntegrationTests/KoreForge.Kafka.Producer.IntegrationTests.csproj" />
+    <Project Path="tst/KoreForge.Kafka.Producer.Tests/KoreForge.Kafka.Producer.Tests.csproj" />
   </Folder>
 </Solution>

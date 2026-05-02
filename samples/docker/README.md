@@ -6,8 +6,8 @@ Local development environment for running integration tests against a real Kafka
 
 | Container | Image | Port |
 |---|---|---|
-| `kf-kafka-redpanda` | Redpanda v24.1 (Kafka-compatible) | `29092` |
-| `kf-kafka-sqledge` | Azure SQL Edge (SQL Server compatible) | `14333` |
+| `koreforge-kafka-redpanda` | Redpanda v24.1 (Kafka-compatible) | `29092` |
+| `koreforge-kafka-sqledge` | Azure SQL Edge (SQL Server compatible) | `14333` |
 
 ## Usage
 

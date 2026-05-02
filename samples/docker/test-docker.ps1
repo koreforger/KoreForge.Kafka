@@ -1,11 +1,11 @@
-﻿[CmdletBinding()]
+[CmdletBinding()]
 param(
     [string]$TopicName = 'sample-messages',
     [string]$SaPassword = 'YourStrong!Passw0rd'
 )
 
 $ErrorActionPreference = 'Stop'
-$containers = @('kf-kafka-redpanda', 'kf-kafka-sqledge')
+$containers = @('koreforge-kafka-redpanda', 'koreforge-kafka-sqledge')
 
 foreach ($name in $containers) {
     $status = (& docker inspect -f '{{.State.Status}}' $name 2>$null).Trim()
@@ -21,7 +21,7 @@ foreach ($name in $containers) {
 }
 
 Write-Host 'Verifying SQL schema...'
-$sqlResult = & docker exec kf-kafka-sqledge /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $SaPassword -d MultiAppSettings -h -1 -W -Q "SELECT COUNT(*) FROM sys.tables WHERE name = 'Settings' AND schema_id = SCHEMA_ID('dbo');"
+$sqlResult = & docker exec koreforge-kafka-sqledge /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $SaPassword -d MultiAppSettings -h -1 -W -Q "SELECT COUNT(*) FROM sys.tables WHERE name = 'Settings' AND schema_id = SCHEMA_ID('dbo');"
 if ($LASTEXITCODE -ne 0) {
     throw 'Failed to query SQL schema.'
 }
@@ -39,7 +39,7 @@ if ($tableCount -lt 1) {
 Write-Host 'Settings table exists.'
 
 Write-Host "Verifying Kafka topic '$TopicName'..."
-$topics = & docker exec kf-kafka-redpanda rpk topic list
+$topics = & docker exec koreforge-kafka-redpanda rpk topic list
 if ($LASTEXITCODE -ne 0) {
     throw 'Unable to list Kafka topics.'
 }
