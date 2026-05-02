@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <!--
     Multi-DLL Bundling Pattern: Explicit ItemGroup
 
@@ -22,10 +22,10 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Confluent.Kafka" />
-    <PackageReference Include="KoreForge.Logging" VersionOverride="1.0.1-alpha" />
-    <PackageReference Include="KoreForge.Metrics" VersionOverride="1.0.1-alpha" />
-    <PackageReference Include="KoreForge.Processing" VersionOverride="1.0.1-alpha" />
-    <PackageReference Include="KoreForge.Time" VersionOverride="1.0.1-alpha" />
+    <PackageReference Include="KoreForge.Logging" VersionOverride="1.1.2" />
+    <PackageReference Include="KoreForge.Metrics" VersionOverride="1.1.2" />
+    <PackageReference Include="KoreForge.Processing" VersionOverride="1.1.2" />
+    <PackageReference Include="KoreForge.Time" VersionOverride="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
@@ -38,12 +38,12 @@
   </ItemGroup>
   <!-- Project references ensure correct build order -->
   <ItemGroup>
-    <PackageReference Include="KoreForge.Kafka.AdminClient" VersionOverride="1.0.1-alpha" />
-    <PackageReference Include="KoreForge.Kafka.Configuration" VersionOverride="1.0.1-alpha" />
-    <PackageReference Include="KoreForge.Kafka.Configuration.AspNetCore" VersionOverride="1.0.1-alpha" />
-    <PackageReference Include="KoreForge.Kafka.Consumer" VersionOverride="1.0.1-alpha" />
-    <PackageReference Include="KoreForge.Kafka.Core" VersionOverride="1.0.1-alpha" />
-    <PackageReference Include="KoreForge.Kafka.Producer" VersionOverride="1.0.1-alpha" />
+    <PackageReference Include="KoreForge.Kafka.AdminClient" VersionOverride="1.1.2" />
+    <PackageReference Include="KoreForge.Kafka.Configuration" VersionOverride="1.1.2" />
+    <PackageReference Include="KoreForge.Kafka.Configuration.AspNetCore" VersionOverride="1.1.2" />
+    <PackageReference Include="KoreForge.Kafka.Consumer" VersionOverride="1.1.2" />
+    <PackageReference Include="KoreForge.Kafka.Core" VersionOverride="1.1.2" />
+    <PackageReference Include="KoreForge.Kafka.Producer" VersionOverride="1.1.2" />
   </ItemGroup>
   <!-- Explicit list of assemblies and XML docs to bundle in the package -->
   <ItemGroup Condition="'$(KoreForgeComponentBinRoot)' == ''">

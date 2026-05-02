@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <IsPackable>false</IsPackable>
@@ -15,8 +15,8 @@
     <PackageReference Include="NSubstitute" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="KoreForge.Kafka.Producer" VersionOverride="1.0.1-alpha" />
-    <PackageReference Include="KoreForge.Kafka.Configuration" VersionOverride="1.0.1-alpha" />
-    <PackageReference Include="KoreForge.Time" VersionOverride="1.0.1-alpha" />
+    <PackageReference Include="KoreForge.Kafka.Producer" VersionOverride="1.1.2" />
+    <PackageReference Include="KoreForge.Kafka.Configuration" VersionOverride="1.1.2" />
+    <PackageReference Include="KoreForge.Time" VersionOverride="1.1.2" />
   </ItemGroup>
 </Project>
