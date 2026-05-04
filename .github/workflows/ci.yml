@@ -2,12 +2,15 @@ name: CI  # 2026-03-16 07:25
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: ['**']
+    tags-ignore: ['**']   # tag pushes are handled by nuget-publish.yml
     paths-ignore:
       - '**.md'
       - 'doc/**'
   pull_request:
-    branches: [ main, develop ]
+    paths-ignore:
+      - '**.md'
+      - 'doc/**'
     paths-ignore:
       - '**.md'
       - 'doc/**'
