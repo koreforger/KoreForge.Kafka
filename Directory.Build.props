@@ -44,6 +44,34 @@
       <FileVersion Condition="'$(FileVersion)' == ''">$(MinVerMajor).$(MinVerMinor).$(MinVerPatch).0</FileVersion>
     </PropertyGroup>
   </Target>
+  <!-- Pack doc/ files and a generated PACKAGE-INFO.md into the NuGet package.
+       None items are bundled inside the .nupkg but are NOT extracted into
+       the consuming project — they are visible on nuget.org and in the
+       local nuget-cache only. -->
+  <Target Name="_PackageDocs" BeforeTargets="GenerateNuspec" Condition="'$(IsPackable)' != 'false'">
+    <MakeDir Directories="$(IntermediateOutputPath)" />
+    <Exec Command="git rev-parse --short HEAD"
+          ConsoleToMSBuild="true"
+          IgnoreExitCode="true"
+          StandardOutputImportance="Low"
+          WorkingDirectory="$(MSBuildThisFileDirectory)">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_DocGitCommit" />
+    </Exec>
+    <PropertyGroup>
+      <_DocGitCommit Condition="'$(_DocGitCommit)' == ''">unknown</_DocGitCommit>
+      <_DocBuildDate>$([System.DateTime]::UtcNow.ToString('yyyy-MM-dd'))</_DocBuildDate>
+    </PropertyGroup>
+    <WriteLinesToFile
+      File="$(IntermediateOutputPath)PACKAGE-INFO.md"
+      Lines="# $(PackageId);Version : $(PackageVersion);Commit  : $(_DocGitCommit);Date    : $(_DocBuildDate)"
+      Overwrite="true" />
+    <ItemGroup>
+      <None Include="$(IntermediateOutputPath)PACKAGE-INFO.md" Pack="true" PackagePath="docs/" />
+      <None Include="$(MSBuildThisFileDirectory)doc\**" Pack="true" PackagePath="docs/"
+            Condition="Exists('$(MSBuildThisFileDirectory)doc')" />
+    </ItemGroup>
+  </Target>
+
 </Project>
 
 

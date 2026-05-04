@@ -28,3 +28,10 @@ coverage.cobertura.xml
 ## OS
 .DS_Store
 Thumbs.db
+
+
+# Prevent accidental commits of NuGet-extracted package content
+/doc/KoreForge.*/
+/doc/Event.*/
+/docs/KoreForge.*/
+/docs/Event.*/
