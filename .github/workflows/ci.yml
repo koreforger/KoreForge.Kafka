@@ -3,7 +3,7 @@ name: CI  # 2026-03-16 07:25
 on:
   push:
     branches: ['**']
-    tags-ignore: ['**']   # tag pushes are handled by nuget-publish.yml
+    tags-ignore: ['**']   # tag pushes are handled by publish-nuget.yml
     paths-ignore:
       - '**.md'
       - 'doc/**'
