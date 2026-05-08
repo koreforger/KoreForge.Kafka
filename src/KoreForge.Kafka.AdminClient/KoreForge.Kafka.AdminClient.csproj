@@ -12,9 +12,9 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="KoreForge.Kafka.Configuration" VersionOverride="1.1.2" />
-    <PackageReference Include="KoreForge.Time" VersionOverride="1.1.2" />
-    <PackageReference Include="KoreForge.Metrics" VersionOverride="1.1.2" />
+    <PackageReference Include="KoreForge.Kafka.Configuration" VersionOverride="0.0.11-alpha.0" />
+    <PackageReference Include="KoreForge.Time" VersionOverride="0.0.11-alpha.0" />
+    <PackageReference Include="KoreForge.Metrics" VersionOverride="0.0.11-alpha.0" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="KoreForge.Kafka.AdminClient.Tests" />
